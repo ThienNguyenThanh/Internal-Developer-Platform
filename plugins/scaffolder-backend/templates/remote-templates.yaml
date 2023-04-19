@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: remoted-templates
+  description: A collection of remotely available Backstage templates
+spec:
+  type: url
+  targets:
+    - https://github.com/ThienNguyenThanh/Backstage-Templates/blob/main/scaffolder-templates/create-react-app/template.yaml
+    - https://github.com/ThienNguyenThanh/Backstage-Templates/blob/main/scaffolder-templates/docs-template/template.yaml
+    - https://github.com/ThienNguyenThanh/Backstage-Templates/blob/main/scaffolder-templates/pull-request/template.yaml
+    - https://github.com/ThienNguyenThanh/Backstage-Templates/blob/main/scaffolder-templates/react-ssr-template/template.yaml
+    - https://github.com/ThienNguyenThanh/Backstage-Templates/blob/main/scaffolder-templates/springboot-grpc-template/template.yaml
