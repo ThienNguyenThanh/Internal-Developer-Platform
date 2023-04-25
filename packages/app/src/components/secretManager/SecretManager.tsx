@@ -29,11 +29,6 @@ function getKeyValue() {
     secret,
     decodedBinarySecret;
 
-  AWS.config.update({
-    accessKeyId: 'AKIA3RPHK4W6BPSIQGRG',
-    secretAccessKey: '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',
-  })
-
   // Create a Secrets Manager client
   let client = new AWS.SecretsManager({
       region: region
