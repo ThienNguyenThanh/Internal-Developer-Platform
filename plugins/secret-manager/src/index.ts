@@ -13,4 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { todoListPlugin, TodoListPage } from './plugin';
+export { secretManagerPlugin, SecretManagerPage } from './plugin';

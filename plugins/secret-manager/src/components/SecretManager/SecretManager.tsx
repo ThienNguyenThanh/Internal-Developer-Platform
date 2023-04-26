@@ -24,23 +24,23 @@ import {
 } from '@backstage/core-plugin-api';
 import { Button } from '@material-ui/core';
 
-export type Todo = {
+export type SecretInfo = {
   title: string;
   id: string;
   author?: string;
   timestamp: number;
 };
 
-type TodosTableProps = {
-  todos: Todo[];
-  onEdit(todo: Todo): any;
+type SecretInfoTableProps = {
+  secretInfos: SecretInfo[];
+  onEdit(secretInfo: SecretInfo): any;
 };
 
-export const TodoList = ({ onEdit }: { onEdit(todo: Todo): any }) => {
+export const SecretList = ({ onEdit }: { onEdit(todo: SecretInfo): any }) => {
   const discoveryApi = useApi(discoveryApiRef);
   const { fetch } = useApi(fetchApiRef);
 
-  const { value, loading, error } = useAsync(async (): Promise<Todo[]> => {
+  const { value, loading, error } = useAsync(async (): Promise<SecretInfo[]> => {
     const response = await fetch(
       `${await discoveryApi.getBaseUrl('todolist')}/todos`,
     );
@@ -53,11 +53,11 @@ export const TodoList = ({ onEdit }: { onEdit(todo: Todo): any }) => {
     return <Alert severity="error">{error.message}</Alert>;
   }
 
-  return <TodosTable todos={value || []} onEdit={onEdit} />;
+  return <SecretInfoTable secretInfos={value || []} onEdit={onEdit} />;
 };
 
-export function TodosTable({ todos, onEdit }: TodosTableProps) {
-  const columns: TableColumn<Todo>[] = [
+export function SecretInfoTable({ secretInfos, onEdit }: SecretInfoTableProps) {
+  const columns: TableColumn<SecretInfo>[] = [
     { title: 'Title', field: 'title' },
     { title: 'Author', field: 'author' },
     {
@@ -82,7 +82,7 @@ export function TodosTable({ todos, onEdit }: TodosTableProps) {
       title="Todos"
       options={{ search: false, paging: false }}
       columns={columns}
-      data={todos}
+      data={secretInfos}
     />
   );
 }

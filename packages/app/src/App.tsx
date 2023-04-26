@@ -37,7 +37,8 @@ import { githubAuthApiRef } from '@backstage/core-plugin-api';
 import { SignInPage } from '@backstage/core-components';
 import { HomepageCompositionRoot } from '@backstage/plugin-home';
 import { HomePage } from './components/home/HomePage';
-import { SecretManagerPage } from './components/secretManager/SecretManager';
+// import { SecretManagerPage } from './components/secretManager/SecretManager';
+import { SecretManagerPage } from '@internal/plugin-secret-manager';
 
 const app = createApp({
   apis,
@@ -110,9 +111,10 @@ const routes = (
     <Route path="/search" element={<SearchPage />}>
       {searchPage}
     </Route>
-    <Route path="/secret-manager" element={<HomepageCompositionRoot />}>
+    {/* <Route path="/secret-manager" element={<HomepageCompositionRoot />}>
       <SecretManagerPage />
-    </Route>
+    </Route> */}
+    <Route path="/secret-manager" element={<SecretManagerPage />} />
     <Route path="/settings" element={<UserSettingsPage />} />
     <Route path="/catalog-graph" element={<CatalogGraphPage />} />
   </FlatRoutes>

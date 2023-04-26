@@ -33,20 +33,21 @@ import {
   HeaderLabel,
   SupportButton,
 } from '@backstage/core-components';
-import { Todo, TodoList } from '../TodoList';
+import { SecretInfo, SecretList } from '../SecretManager';
 import {
   alertApiRef,
   discoveryApiRef,
   fetchApiRef,
   useApi,
 } from '@backstage/core-plugin-api';
+import { Todo } from '@internal/plugin-secret-manager-backend/src/service/todos';
 
-export const TodoListPage = () => {
+export const SecretManagerPage = () => {
   const discoveryApi = useApi(discoveryApiRef);
   const { fetch } = useApi(fetchApiRef);
   const alertApi = useApi(alertApiRef);
   const [key, refetchTodos] = useReducer(i => i + 1, 0);
-  const [editElement, setEdit] = useState<Todo | undefined>();
+  const [editElement, setEdit] = useState<SecretInfo | undefined>();
 
   const handleAdd = async (title: string) => {
     try {
@@ -74,7 +75,7 @@ export const TodoListPage = () => {
     }
   };
 
-  const handleEdit = async (todo: Todo) => {
+  const handleEdit = async (todo: SecretInfo) => {
     setEdit(undefined);
     try {
       const response = await fetch(
@@ -119,7 +120,7 @@ export const TodoListPage = () => {
             <AddTodo onAdd={handleAdd} />
           </Grid>
           <Grid item>
-            <TodoList key={key} onEdit={setEdit} />
+            <SecretList key={key} onEdit={setEdit} />
           </Grid>
         </Grid>
       </Content>
