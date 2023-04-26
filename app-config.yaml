@@ -5,13 +5,16 @@ app:
 organization:
   name: My Company
 
+permission:
+  enabled: true
+
 backend:
   # Used for enabling authentication, secret is shared by all backend plugins
   # See https://backstage.io/docs/auth/service-to-service-auth for
   # information on the format
   # auth:
   #   keys:
-  #     - secret: ${BACKEND_SECRET}
+  #     - secret: 'n2UesVcB/zDDQpIepDpCViqmcbEIbgMw'
   baseUrl: http://localhost:7007
   listen:
     port: 7007

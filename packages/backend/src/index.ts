@@ -31,6 +31,7 @@ import search from './plugins/search';
 import { PluginEnvironment } from './types';
 import { ServerPermissionClient } from '@backstage/plugin-permission-node';
 import { DefaultIdentityClient } from '@backstage/plugin-auth-node';
+import permission from './plugins/permission';
 import secretManager from './plugins/secretManager';
 
 function makeCreateEnv(config: Config) {
@@ -39,7 +40,7 @@ function makeCreateEnv(config: Config) {
   const discovery = SingleHostDiscovery.fromConfig(config);
   const cacheManager = CacheManager.fromConfig(config);
   const databaseManager = DatabaseManager.fromConfig(config, { logger: root });
-  const tokenManager = ServerTokenManager.noop();
+  const tokenManager = ServerTokenManager.fromConfig(config, { logger: root });
   const taskScheduler = TaskScheduler.fromConfig(config);
 
   const identity = DefaultIdentityClient.create({
@@ -86,6 +87,7 @@ async function main() {
   const techdocsEnv = useHotMemoize(module, () => createEnv('techdocs'));
   const searchEnv = useHotMemoize(module, () => createEnv('search'));
   const appEnv = useHotMemoize(module, () => createEnv('app'));
+  const permissionEnv = useHotMemoize(module, () => createEnv('permission'));
   const secretManagerEnv = useHotMemoize(module, () => createEnv('secretManager'));
 
   const apiRouter = Router();
@@ -95,6 +97,7 @@ async function main() {
   apiRouter.use('/techdocs', await techdocs(techdocsEnv));
   apiRouter.use('/proxy', await proxy(proxyEnv));
   apiRouter.use('/search', await search(searchEnv));
+  apiRouter.use('/permission', await permission(permissionEnv));
   apiRouter.use('/secretManager', await secretManager(secretManagerEnv));
 
   // Add backends ABOVE this line; this 404 handler is the catch-all fallback

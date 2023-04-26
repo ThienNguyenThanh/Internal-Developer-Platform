@@ -37,16 +37,40 @@ export default async function createPlugin(
       //   https://backstage.io/docs/auth/identity-resolver
       github: providers.github.create({
         signIn: {
-          resolver(_, ctx) {
-            const userRef = 'user:default/guest'; // Must be a full entity reference
+          async resolver({ result: { fullProfile } }, ctx) {
+            const userId = fullProfile.username;
+            if (!userId) {
+              throw new Error(
+                `GitHub user profile does not contain a username`,
+              );
+            }
+
+            let userEntityRef;
+            if(userId == 'ThienNguyenThanh'){
+              userEntityRef = {
+                kind: 'User',
+                name: userId,
+                namespace: 'admin',
+              };
+            }else{
+              userEntityRef = {
+                kind: 'User',
+                name: userId,
+                namespace: 'default',
+              };
+            }
+
+            const stringifyUserEntityRef = `${userEntityRef.kind.toLocaleLowerCase('en-US',
+                                            )}:${userEntityRef.namespace.toLocaleLowerCase('en-US',
+                                            )}/${userEntityRef.name.toLocaleLowerCase('en-US')}`
+
             return ctx.issueToken({
               claims: {
-                sub: userRef, // The user's own identity
-                ent: [userRef], // A list of identities that the user claims ownership through
+                sub: stringifyUserEntityRef,
+                ent: [stringifyUserEntityRef],
               },
             });
           },
-          // resolver: providers.github.resolvers.usernameMatchingUserEntityName(),
         },
       }),
     },
