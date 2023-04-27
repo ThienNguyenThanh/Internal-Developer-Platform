@@ -23,6 +23,12 @@ import {
   useApi,
 } from '@backstage/core-plugin-api';
 import { Button } from '@material-ui/core';
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from "@aws-sdk/client-secrets-manager";
+import 'aws-sdk';
+
 
 export type SecretInfo = {
   title: string;
@@ -39,11 +45,88 @@ type SecretInfoTableProps = {
 export const SecretList = ({ onEdit }: { onEdit(todo: SecretInfo): any }) => {
   const discoveryApi = useApi(discoveryApiRef);
   const { fetch } = useApi(fetchApiRef);
+  let AWS = require('aws-sdk'),
+    region = "us-east-1",
+    secretName = "key1",
+    secret,
+    decodedBinarySecret;
+
+  AWS.config.update({
+    accessKeyId: 'AKIA3RPHK4W6COZFNDAQ',
+    secretAccessKey: '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',
+  })
+
+  // Create a Secrets Manager client
+  let client = new AWS.SecretsManager({
+      region: region
+  });
+  let params = {
+      "Filters": [ 
+         { 
+            "Key": "tag-key",
+            "Values": [ "admin" ]
+         }
+      ],
+      "MaxResults": 10,
+  }
+
+  client.listSecrets(params, function(err, data) {
+    if (err) {
+        if (err.code === 'DecryptionFailureException')
+            // Secrets Manager can't decrypt the protected secret text using the provided KMS key.
+            // Deal with the exception here, and/or rethrow at your discretion.
+            throw err;
+        else if (err.code === 'InternalServiceErrorException')
+            // An error occurred on the server side.
+            // Deal with the exception here, and/or rethrow at your discretion.
+            throw err;
+        else if (err.code === 'InvalidParameterException')
+            // You provided an invalid value for a parameter.
+            // Deal with the exception here, and/or rethrow at your discretion.
+            throw err;
+        else if (err.code === 'InvalidRequestException')
+            // You provided a parameter value that is not valid for the current state of the resource.
+            // Deal with the exception here, and/or rethrow at your discretion.
+            throw err;
+        else if (err.code === 'ResourceNotFoundException')
+            // We can't find the resource that you asked for.
+            // Deal with the exception here, and/or rethrow at your discretion.
+            throw err;
+    }
+    else {
+        // Decrypts secret using the associated KMS CMK.
+        // Depending on whether the secret is a string or binary, one of these fields will be populated.
+        // if ('SecretString' in data) {
+        //     secret = data.SecretString;
+        //     console.log(secret);
+        // } else {
+        //     let buff = new Buffer(data.SecretBinary, 'base64');
+        //     decodedBinarySecret = buff.toString('ascii');
+        // }
+        console.log(data)
+    }});
+
 
   const { value, loading, error } = useAsync(async (): Promise<SecretInfo[]> => {
+    // try {
+    //   awsRes = await client.send(
+    //     new GetSecretValueCommand({
+    //       SecretId: "key1",
+    //       VersionStage: "AWSCURRENT", // VersionStage defaults to AWSCURRENT if unspecified
+    //     })
+    //   );
+    // } catch (error) {
+    //   // For a list of exceptions thrown, see
+    //   // https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+    //   throw error;
+    // }
     const response = await fetch(
       `${await discoveryApi.getBaseUrl('todolist')}/todos`,
     );
+    // const secret = await client.send(command);
+    // const secret = awsRes.SecretString;
+    // console.log(secret);
+
     return response.json();
   }, []);
 

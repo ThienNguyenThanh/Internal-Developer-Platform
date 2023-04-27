@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { todoListPlugin } from './plugin';
+import { secretManagerPlugin } from './plugin';
 
 describe('todo-list', () => {
   it('should export plugin', () => {
-    expect(todoListPlugin).toBeDefined();
+    expect(secretManagerPlugin).toBeDefined();
   });
 });
