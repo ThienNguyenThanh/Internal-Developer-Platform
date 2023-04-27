@@ -51,11 +51,6 @@ export const SecretList = ({ onEdit }: { onEdit(todo: SecretInfo): any }) => {
     secret,
     decodedBinarySecret;
 
-  AWS.config.update({
-    accessKeyId: 'AKIA3RPHK4W6COZFNDAQ',
-    secretAccessKey: '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',
-  })
-
   // Create a Secrets Manager client
   let client = new AWS.SecretsManager({
       region: region
