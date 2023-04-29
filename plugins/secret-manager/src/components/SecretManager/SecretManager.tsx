@@ -48,7 +48,6 @@ export const SecretList = ({ onEdit }: { onEdit(todo: SecretInfo): any }) => {
     region = "us-east-1";
 
 
-
   // Create a Secrets Manager client
   let client = new AWS.SecretsManager({
     region: region
