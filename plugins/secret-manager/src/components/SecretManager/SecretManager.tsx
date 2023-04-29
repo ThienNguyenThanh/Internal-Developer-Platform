@@ -17,24 +17,25 @@ import React from 'react';
 import { Table, TableColumn, Progress } from '@backstage/core-components';
 import Alert from '@material-ui/lab/Alert';
 import useAsync from 'react-use/lib/useAsync';
-import {
-  discoveryApiRef,
-  fetchApiRef,
-  useApi,
-} from '@backstage/core-plugin-api';
+// import {
+//   discoveryApiRef,
+//   fetchApiRef,
+//   useApi,
+// } from '@backstage/core-plugin-api';
 import { Button } from '@material-ui/core';
-import {
-  SecretsManagerClient,
-  GetSecretValueCommand,
-} from "@aws-sdk/client-secrets-manager";
+// import {
+//   SecretsManagerClient,
+//   GetSecretValueCommand,
+//   ListSecretsCommand
+// } from "@aws-sdk/client-secrets-manager";
 import 'aws-sdk';
 
-
 export type SecretInfo = {
-  title: string;
   id: string;
-  author?: string;
-  timestamp: number;
+  keyName: string;
+  ARN: string;
+  lastChangedDate: number;
+  owner: string;
 };
 
 type SecretInfoTableProps = {
@@ -43,91 +44,56 @@ type SecretInfoTableProps = {
 };
 
 export const SecretList = ({ onEdit }: { onEdit(todo: SecretInfo): any }) => {
-  const discoveryApi = useApi(discoveryApiRef);
-  const { fetch } = useApi(fetchApiRef);
   let AWS = require('aws-sdk'),
-    region = "us-east-1",
-    secretName = "key1",
-    secret,
-    decodedBinarySecret;
+    region = "us-east-1";
 
-  AWS.config.update({
-    accessKeyId: 'AKIA3RPHK4W6COZFNDAQ',
-    secretAccessKey: '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',
-  })
+
 
   // Create a Secrets Manager client
   let client = new AWS.SecretsManager({
-      region: region
+    region: region
   });
+
   let params = {
-      "Filters": [ 
-         { 
+      Filters: [ 
+        { 
             "Key": "tag-key",
             "Values": [ "admin" ]
-         }
+        }
       ],
-      "MaxResults": 10,
+      MaxResults: 10,
+  }
+  
+
+  function getListOfSecret( response:SecretInfo[] ){
+    return new Promise( (resolve, reject) => {
+      client.listSecrets(params, function(err:any, res:any) {
+        if (err) {
+          reject(err);
+        }
+        else {
+          console.log("set up request")
+          var awsKey;
+          var data = res.SecretList;
+          for(awsKey in data) {
+              response.push({
+                "id":  data[awsKey].Name,
+                "ARN": data[awsKey].ARN,
+                "keyName": data[awsKey].Name,
+                "lastChangedDate": data[awsKey].LastChangedDate,
+                "owner": "user:admin/thiennguyenthanh",
+              })
+          }
+          resolve(response)
+        }});
+    })
   }
 
-  client.listSecrets(params, function(err, data) {
-    if (err) {
-        if (err.code === 'DecryptionFailureException')
-            // Secrets Manager can't decrypt the protected secret text using the provided KMS key.
-            // Deal with the exception here, and/or rethrow at your discretion.
-            throw err;
-        else if (err.code === 'InternalServiceErrorException')
-            // An error occurred on the server side.
-            // Deal with the exception here, and/or rethrow at your discretion.
-            throw err;
-        else if (err.code === 'InvalidParameterException')
-            // You provided an invalid value for a parameter.
-            // Deal with the exception here, and/or rethrow at your discretion.
-            throw err;
-        else if (err.code === 'InvalidRequestException')
-            // You provided a parameter value that is not valid for the current state of the resource.
-            // Deal with the exception here, and/or rethrow at your discretion.
-            throw err;
-        else if (err.code === 'ResourceNotFoundException')
-            // We can't find the resource that you asked for.
-            // Deal with the exception here, and/or rethrow at your discretion.
-            throw err;
-    }
-    else {
-        // Decrypts secret using the associated KMS CMK.
-        // Depending on whether the secret is a string or binary, one of these fields will be populated.
-        // if ('SecretString' in data) {
-        //     secret = data.SecretString;
-        //     console.log(secret);
-        // } else {
-        //     let buff = new Buffer(data.SecretBinary, 'base64');
-        //     decodedBinarySecret = buff.toString('ascii');
-        // }
-        console.log(data)
-    }});
-
-
   const { value, loading, error } = useAsync(async (): Promise<SecretInfo[]> => {
-    // try {
-    //   awsRes = await client.send(
-    //     new GetSecretValueCommand({
-    //       SecretId: "key1",
-    //       VersionStage: "AWSCURRENT", // VersionStage defaults to AWSCURRENT if unspecified
-    //     })
-    //   );
-    // } catch (error) {
-    //   // For a list of exceptions thrown, see
-    //   // https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
-    //   throw error;
-    // }
-    const response = await fetch(
-      `${await discoveryApi.getBaseUrl('todolist')}/todos`,
-    );
-    // const secret = await client.send(command);
-    // const secret = awsRes.SecretString;
-    // console.log(secret);
+    let response:SecretInfo[] =[];
+    await getListOfSecret(response);
 
-    return response.json();
+    return response;
   }, []);
 
   if (loading) {
@@ -141,13 +107,15 @@ export const SecretList = ({ onEdit }: { onEdit(todo: SecretInfo): any }) => {
 
 export function SecretInfoTable({ secretInfos, onEdit }: SecretInfoTableProps) {
   const columns: TableColumn<SecretInfo>[] = [
-    { title: 'Title', field: 'title' },
-    { title: 'Author', field: 'author' },
+    { title: 'Key-Name', field: 'keyName' },
+    { title: 'ARN', field: 'ARN' },
     {
       title: 'Last edit',
-      field: 'timestamp',
-      render: e => new Date(e.timestamp).toLocaleString(),
+      field: 'lastChangedDate',
+      render: e => new Date(e.lastChangedDate).toLocaleString(),
     },
+    { title: 'Owner', field: 'owner' },
+    { title: 'Viewer', field:'some viewers' },
     {
       title: 'Action',
       render: todo => {
