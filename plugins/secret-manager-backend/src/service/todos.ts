@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 import { v4 as uuid } from 'uuid';
-import { NotFoundError } from '@backstage/errors';
 
 export type Todo = {
-  title: string;
-  author?: string;
-  id: string;
-  timestamp: number;
+  id: string,
+  keyName: string;
+  ARN: string;
+  lastChangedDate: number;
+  owner: string;
 };
 
 export type TodoFilter = {
-  property: Exclude<keyof Todo, 'timestamp'>;
+  property: Exclude<keyof Todo, 'lastChangedDate'>;
   values: Array<string | undefined>;
 };
 
@@ -58,10 +58,10 @@ const matches = (todo: Todo, filters?: TodoFilters): boolean => {
   return filters.values.includes(todo[filters.property]);
 };
 
-export function add(todo: Omit<Todo, 'id' | 'timestamp'>) {
+export function add(todo: Omit<Todo, 'id' | 'lastChangedDate'>) {
   const id = uuid();
 
-  const obj: Todo = { ...todo, id, timestamp: Date.now() };
+  const obj: Todo = { ...todo, id, lastChangedDate: Date.now() };
   todos[id] = obj;
   return obj;
 }
@@ -70,23 +70,23 @@ export function getTodo(id: string) {
   return todos[id];
 }
 
-export function update({ id, title }: { id: string; title: string }) {
-  let todo = todos[id];
-  if (!todo) {
-    throw new NotFoundError('Item not found');
-  }
+// export function update({ id, title }: { id: string; title: string }) {
+//   let todo = todos[id];
+//   if (!todo) {
+//     throw new NotFoundError('Item not found');
+//   }
 
-  todo = { ...todo, title, timestamp: Date.now() };
-  todos[id] = todo;
-  return todo;
-}
+//   todo = { ...todo, title, timestamp: Date.now() };
+//   todos[id] = todo;
+//   return todo;
+// }
 
 export function getAll(filter?: TodoFilters) {
   return Object.values(todos)
     .filter(value => matches(value, filter))
-    .sort((a, b) => b.timestamp - a.timestamp);
+    .sort((a, b) => b.lastChangedDate - a.lastChangedDate);
 }
 
 // prepopulate the db
-add({ title: 'just a note' });
-add({ title: 'another note' });
+// add({ title: 'just a note' });
+// add({ title: 'another note' });

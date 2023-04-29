@@ -18,8 +18,10 @@ import {
   createServiceBuilder,
   loadBackendConfig,
   SingleHostDiscovery,
+  ServerTokenManager
 } from '@backstage/backend-common';
 import { DefaultIdentityClient } from '@backstage/plugin-auth-node';
+import { ServerPermissionClient } from '@backstage/plugin-permission-node'
 import { Server } from 'http';
 import { Logger } from 'winston';
 import { createRouter } from './router';
@@ -37,17 +39,25 @@ export async function startStandaloneServer(
   logger.debug('Starting application server...');
   const config = await loadBackendConfig({ logger, argv: process.argv });
   const discovery = SingleHostDiscovery.fromConfig(config);
+  const tokenManager = ServerTokenManager.fromConfig(config, {
+    logger,
+  });
+  const permissions = ServerPermissionClient.fromConfig(config, {
+    discovery,
+    tokenManager,
+  });
   const router = await createRouter({
     logger,
     identity: DefaultIdentityClient.create({
       discovery,
       issuer: await discovery.getExternalBaseUrl('auth'),
     }),
+    permissions,
   });
 
   let service = createServiceBuilder(module)
     .setPort(options.port)
-    .addRouter('/todo-list', router);
+    .addRouter('/secret-manager', router);
   if (options.enableCors) {
     service = service.enableCors({ origin: 'http://localhost:3000' });
   }

@@ -13,46 +13,43 @@ import {
 import { Router } from 'express';
 import { PluginEnvironment } from '../types';
 import { isPermission } from '@backstage/plugin-permission-common';
-// import {
-//   todoListCreatePermission,
-//   todoListUpdatePermission,
-//   todoListReadPermission
-// } from '@internal/plugin-secret-manager-common';
-// import {
-//   todoListConditions,
-//   createTodoListConditionalDecision,
-// } from '@internal/plugin-secret-manager-backend';
+import {
+  todoListCreatePermission,
+  todoListUpdatePermission,
+  secretReadPermission
+} from '@internal/plugin-secret-manager-common';
+import {
+  todoListConditions,
+  createTodoListConditionalDecision,
+} from '@internal/plugin-secret-manager-backend';
 
 class TestPermissionPolicy implements PermissionPolicy {
-  async handle(): Promise<PolicyDecision> {
-    return { result: AuthorizeResult.ALLOW };
+  async handle(
+    request: PolicyQuery,
+    user?: BackstageIdentityResponse,
+  ): Promise<PolicyDecision> {
+    if (isPermission(request.permission, todoListCreatePermission)) {
+      return {
+        result: AuthorizeResult.ALLOW,
+      };
+    }
+
+    if (
+      isPermission(request.permission, todoListUpdatePermission) ||
+      isPermission(request.permission, secretReadPermission)
+    ) {
+      return createTodoListConditionalDecision(
+        request.permission,
+        todoListConditions.isOwner({
+          userId: user?.identity.userEntityRef ?? '',
+        }),
+      );
+    }
+
+    return {
+      result: AuthorizeResult.ALLOW,
+    };
   }
-  // async handle(
-  //   request: PolicyQuery,
-  //   user?: BackstageIdentityResponse,
-  // ): Promise<PolicyDecision> {
-  //   if (isPermission(request.permission, todoListCreatePermission)) {
-  //     return {
-  //       result: AuthorizeResult.ALLOW,
-  //     };
-  //   }
-
-  //   if ( 
-  //     isPermission(request.permission, todoListUpdatePermission) ||
-  //     isPermission(request.permission, todoListReadPermission)
-  //   ) {
-  //     return createTodoListConditionalDecision(
-  //       request.permission,
-  //       todoListConditions.isOwner({
-  //         userId: user?.identity.userEntityRef ?? '',
-  //       }),
-  //     );
-  //   }
-
-    // return {
-    //   result: AuthorizeResult.ALLOW,
-    // };
-  // }
 }
 
 export default async function createPlugin(

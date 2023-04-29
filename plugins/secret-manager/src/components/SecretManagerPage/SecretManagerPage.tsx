@@ -29,9 +29,7 @@ import {
   Header,
   Page,
   Content,
-  ContentHeader,
   HeaderLabel,
-  SupportButton,
 } from '@backstage/core-components';
 import { SecretInfo, SecretList } from '../SecretManager';
 import {
@@ -48,6 +46,7 @@ export const SecretManagerPage = () => {
   const alertApi = useApi(alertApiRef);
   const [key, refetchTodos] = useReducer(i => i + 1, 0);
   const [editElement, setEdit] = useState<SecretInfo | undefined>();
+  
 
   const handleAdd = async (title: string) => {
     try {
@@ -82,7 +81,7 @@ export const SecretManagerPage = () => {
         `${await discoveryApi.getBaseUrl('todolist')}/todos`,
         {
           method: 'PUT',
-          body: JSON.stringify({ title: todo.title, id: todo.id }),
+          body: JSON.stringify({ title: todo.keyName, id: todo.id }),
           headers: {
             'Content-Type': 'application/json',
           },
@@ -105,16 +104,13 @@ export const SecretManagerPage = () => {
   return (
     <Page themeId="tool">
       <Header
-        title="Welcome to todo-list!"
-        subtitle="Just a CRU todo list plugin"
+        title="Secret Manager"
+        subtitle="List of secret key in AWS"
       >
         <HeaderLabel label="Owner" value="Team X" />
         <HeaderLabel label="Lifecycle" value="Alpha" />
       </Header>
       <Content>
-        <ContentHeader title="Todo List">
-          <SupportButton>A description of your plugin goes here.</SupportButton>
-        </ContentHeader>
         <Grid container spacing={3} direction="column">
           <Grid item>
             <AddTodo onAdd={handleAdd} />
@@ -140,7 +136,7 @@ function AddTodo({ onAdd }: { onAdd: (title: string) => any }) {
 
   return (
     <>
-      <Typography variant="body1">Add todo</Typography>
+      <Typography variant="body1">Add key</Typography>
       <Box
         component="span"
         alignItems="flex-end"
@@ -165,6 +161,7 @@ function EditModal({
   onSubmit,
 }: {
   todo?: Todo;
+  secretValue?: string;
   onSubmit(t: Todo): any;
   onCancel(): any;
 }) {
@@ -175,7 +172,7 @@ function EditModal({
       <DialogContent>
         <TextField
           placeholder="Write something here..."
-          defaultValue={todo?.title || ''}
+          defaultValue={todo?.keyName || ''}
           onChange={e => (title.current = e.target.value)}
           margin="dense"
           fullWidth
@@ -186,7 +183,7 @@ function EditModal({
           Cancel
         </Button>
         <Button
-          onClick={() => onSubmit({ ...todo!, title: title.current })}
+          onClick={() => onSubmit({ ...todo!, keyName: title.current })}
           color="primary"
         >
           Save

@@ -15,4 +15,5 @@
  */
 
 export * from './service/router';
+export * from './conditionExports';
 export { exampleTodoListPlugin } from './plugin';

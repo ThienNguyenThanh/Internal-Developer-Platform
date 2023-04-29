@@ -16,10 +16,22 @@
 
 import { getVoidLogger } from '@backstage/backend-common';
 import { DefaultIdentityClient } from '@backstage/plugin-auth-node';
+import { PermissionEvaluator } from '@backstage/plugin-permission-common';
 import express from 'express';
 import request from 'supertest';
 
 import { createRouter } from './router';
+
+const mockedAuthorize: jest.MockedFunction<PermissionEvaluator['authorize']> =
+  jest.fn();
+const mockedPermissionQuery: jest.MockedFunction<
+  PermissionEvaluator['authorizeConditional']
+> = jest.fn();
+
+const permissionEvaluator: PermissionEvaluator = {
+  authorize: mockedAuthorize,
+  authorizeConditional: mockedPermissionQuery,
+};
 
 describe('createRouter', () => {
   let app: express.Express;
@@ -28,6 +40,7 @@ describe('createRouter', () => {
     const router = await createRouter({
       logger: getVoidLogger(),
       identity: {} as DefaultIdentityClient,
+      permissions: permissionEvaluator,
     });
     app = express().use(router);
   });
