@@ -29,7 +29,7 @@ import { Button } from '@material-ui/core';
 //   ListSecretsCommand
 // } from "@aws-sdk/client-secrets-manager";
 import 'aws-sdk';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv'
 
 dotenv.config();
 

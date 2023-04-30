@@ -42,29 +42,20 @@ backend:
 integrations:
   github:
     - host: github.com
-      token: ${GITHUB_TOKEN}
+      token: ${BACKSTAGE_GITHUB_TOKEN}
 
 auth:
   environment: development
   providers:
     github:
       development:
-        clientId: ${GITHUB_DEVELOPMENT_CLIENT_ID}
-        clientSecret: ${GITHUB_DEVELOPMENT_CLIENT_SECRET}
-        # clientId: ddf95046851cff3e5099
-        # clientSecret: c50e985da556fd9c8438230df357aaa4a1ec8566
-
-  # environment: production
-  # providers:
-  #   github:
-  #     development:
-  #       clientId: ${GITHUB_PRODUCTION_CLIENT_ID}
-  #       clientSecret: ${GITHUB_PRODUCTION_CLIENT_SECRET}
+        clientId: ${BACKSTAGE_GITHUB_CLIENT_ID}
+        clientSecret: ${BACKSTAGE_GITHUB_CLIENT_SECRET}
 
 catalog:
-  import:
-    entityFilename: catalog-info.yaml
-    pullRequestBranchName: backstage-integration
+  # import:
+  #   entityFilename: catalog-info.yaml
+  #   pullRequestBranchName: backstage-integration
   rules:
     - allow: [Component, API, System, Domain, Resource, Location, User, Group]
   locations:
