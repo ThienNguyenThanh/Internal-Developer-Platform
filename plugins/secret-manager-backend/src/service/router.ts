@@ -19,7 +19,7 @@ import express from 'express';
 import Router from 'express-promise-router';
 import { Logger } from 'winston';
 import { getAll,TodoFilter,getTodo } from './todos';
-import { InputError, NotAllowedError } from '@backstage/errors';
+import { NotAllowedError } from '@backstage/errors';
 import { getBearerTokenFromAuthorizationHeader, IdentityApi } from '@backstage/plugin-auth-node';
 import { PermissionEvaluator, AuthorizeResult } from '@backstage/plugin-permission-common';
 import {
@@ -58,7 +58,7 @@ export interface RouterOptions {
 export async function createRouter(
   options: RouterOptions,
 ): Promise<express.Router> {
-  const { logger, identity, permissions } = options;
+  const { logger, permissions } = options;
 
   const permissionIntegrationRouter = createPermissionIntegrationRouter({
     permissions: [todoListCreatePermission, todoListUpdatePermission, secretReadPermission],

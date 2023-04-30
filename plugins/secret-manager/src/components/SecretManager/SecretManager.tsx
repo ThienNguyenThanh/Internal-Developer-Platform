@@ -29,6 +29,9 @@ import { Button } from '@material-ui/core';
 //   ListSecretsCommand
 // } from "@aws-sdk/client-secrets-manager";
 import 'aws-sdk';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export type SecretInfo = {
   id: string;
@@ -47,6 +50,10 @@ export const SecretList = ({ onEdit }: { onEdit(todo: SecretInfo): any }) => {
   let AWS = require('aws-sdk'),
     region = "us-east-1";
 
+  AWS.config.update({
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  })
 
   // Create a Secrets Manager client
   let client = new AWS.SecretsManager({

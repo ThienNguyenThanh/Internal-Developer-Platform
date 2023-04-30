@@ -1,119 +1,111 @@
-import React from 'react';
-import { makeStyles, Theme, Grid, Paper } from '@material-ui/core';
-
+import { Content, Header, Lifecycle, Page } from '@backstage/core-components';
 import { CatalogSearchResultListItem } from '@backstage/plugin-catalog';
-import {
-  catalogApiRef,
-  CATALOG_FILTER_EXISTS,
-} from '@backstage/plugin-catalog-react';
-import { TechDocsSearchResultListItem } from '@backstage/plugin-techdocs';
-
 import { SearchType } from '@backstage/plugin-search';
 import {
+  DefaultResultListItem,
   SearchBar,
   SearchFilter,
   SearchResult,
-  SearchPagination,
-  useSearch,
+  SearchResultPager,
 } from '@backstage/plugin-search-react';
-import {
-  CatalogIcon,
-  Content,
-  DocsIcon,
-  Header,
-  Page,
-} from '@backstage/core-components';
-import { useApi } from '@backstage/core-plugin-api';
+import { TechDocsSearchResultListItem } from '@backstage/plugin-techdocs';
+import { Grid, List, makeStyles, Paper, Theme } from '@material-ui/core';
+import React from 'react';
+import { ToolSearchResultListItem } from '@backstage/plugin-explore';
 
 const useStyles = makeStyles((theme: Theme) => ({
   bar: {
     padding: theme.spacing(1, 0),
-  },
-  filters: {
-    padding: theme.spacing(2),
-    marginTop: theme.spacing(2),
   },
   filter: {
     '& + &': {
       marginTop: theme.spacing(2.5),
     },
   },
+  filters: {
+    padding: theme.spacing(2),
+  },
 }));
 
 const SearchPage = () => {
   const classes = useStyles();
-  const { types } = useSearch();
-  const catalogApi = useApi(catalogApiRef);
-
   return (
     <Page themeId="home">
-      <Header title="Search" />
+      <Header title="Search" subtitle={<Lifecycle alpha />} />
       <Content>
         <Grid container direction="row">
           <Grid item xs={12}>
             <Paper className={classes.bar}>
-              <SearchBar />
+              <SearchBar debounceTime={100} />
             </Paper>
           </Grid>
           <Grid item xs={3}>
-            <SearchType.Accordion
-              name="Result Type"
-              defaultValue="software-catalog"
-              types={[
-                {
-                  value: 'software-catalog',
-                  name: 'Software Catalog',
-                  icon: <CatalogIcon />,
-                },
-                {
-                  value: 'techdocs',
-                  name: 'Documentation',
-                  icon: <DocsIcon />,
-                },
-              ]}
-            />
             <Paper className={classes.filters}>
-              {types.includes('techdocs') && (
-                <SearchFilter.Select
-                  className={classes.filter}
-                  label="Entity"
-                  name="name"
-                  values={async () => {
-                    // Return a list of entities which are documented.
-                    const { items } = await catalogApi.getEntities({
-                      fields: ['metadata.name'],
-                      filter: {
-                        'metadata.annotations.backstage.io/techdocs-ref':
-                          CATALOG_FILTER_EXISTS,
-                      },
-                    });
-
-                    const names = items.map(entity => entity.metadata.name);
-                    names.sort();
-                    return names;
-                  }}
-                />
-              )}
+              <SearchType
+                values={['techdocs', 'software-catalog']}
+                name="type"
+                defaultValue="software-catalog"
+              />
               <SearchFilter.Select
                 className={classes.filter}
-                label="Kind"
                 name="kind"
                 values={['Component', 'Template']}
               />
               <SearchFilter.Checkbox
                 className={classes.filter}
-                label="Lifecycle"
                 name="lifecycle"
                 values={['experimental', 'production']}
               />
             </Paper>
           </Grid>
           <Grid item xs={9}>
-            <SearchPagination />
             <SearchResult>
-              <CatalogSearchResultListItem icon={<CatalogIcon />} />
-              <TechDocsSearchResultListItem icon={<DocsIcon />} />
+              {({ results }) => (
+                <List>
+                  {results.map(({ type, document, highlight, rank }) => {
+                    switch (type) {
+                      case 'software-catalog':
+                        return (
+                          <CatalogSearchResultListItem
+                            key={document.location}
+                            result={document}
+                            highlight={highlight}
+                            rank={rank}
+                          />
+                        );
+                      case 'techdocs':
+                        return (
+                          <TechDocsSearchResultListItem
+                            key={document.location}
+                            result={document}
+                            highlight={highlight}
+                            rank={rank}
+                          />
+                        );
+                      case 'tools':
+                        return (
+                          <ToolSearchResultListItem
+                            key={document.location}
+                            result={document}
+                            highlight={highlight}
+                            rank={rank}
+                          />
+                        );
+                      default:
+                        return (
+                          <DefaultResultListItem
+                            key={document.location}
+                            result={document}
+                            highlight={highlight}
+                            rank={rank}
+                          />
+                        );
+                    }
+                  })}
+                </List>
+              )}
             </SearchResult>
+            <SearchResultPager />
           </Grid>
         </Grid>
       </Content>

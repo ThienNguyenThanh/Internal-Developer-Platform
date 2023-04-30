@@ -1,118 +1,135 @@
 app:
-  title: Scaffolded Backstage App
+  title: Backstage Demo
   baseUrl: http://localhost:3000
+  support:
+    url: https://github.com/backstage/backstage/issues
+    items:
+      - title: Backstage Community
+        icon: chat
+        links:
+          - url: https://backstage.io/docs/overview/support
+            title: Support and community
+      - title: Backstage News
+        icon: docs
+        links:
+          - url: https://backstage.io/blog/
+            title: Backstage Blog
 
 organization:
-  name: My Company
+  name: Backstage
 
 permission:
   enabled: true
 
 backend:
-  # Used for enabling authentication, secret is shared by all backend plugins
-  # See https://backstage.io/docs/auth/service-to-service-auth for
-  # information on the format
-  # auth:
-  #   keys:
-  #     - secret: 'n2UesVcB/zDDQpIepDpCViqmcbEIbgMw'
+  auth:
+    keys:
+      - secret: ${BACKEND_SECRET}
   baseUrl: http://localhost:7007
   listen:
     port: 7007
-    # Uncomment the following host directive to bind to specific interfaces
-    # host: 127.0.0.1
   csp:
     connect-src: ["'self'", 'http:', 'https:']
-    # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
-    # Default Helmet Content-Security-Policy values can be removed by setting the key to false
+    img-src: ["'self'", 'data:', 'https://backstage.io']
   cors:
     origin: http://localhost:3000
-    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    methods: [GET, POST, PUT, DELETE]
     credentials: true
-  # This is for local development only, it is not recommended to use this in production
-  # The production database configuration is stored in app-config.production.yaml
   database:
-    # client: better-sqlite3
-    # connection: ':memory:'
-    client: pg
-    connection:
-      host: '127.0.0.1'
-      port: 5432
-      user: 'postgres'
-      password: 'mysecretpassword'
-  cache:
-    store: memory
-  # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
+    client: better-sqlite3
+    connection: ':memory:'
 
 integrations:
   github:
     - host: github.com
-      # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
-      # about setting up the GitHub integration here: https://backstage.io/docs/getting-started/configuration#setting-up-a-github-integration
-      token: empty
-    ### Example for how to add your GitHub Enterprise instance using the API:
-    # - host: ghe.example.net
-    #   apiBaseUrl: https://ghe.example.net/api/v3
-    #   token: ${GHE_TOKEN}
-
-proxy:
-  ### Example for how to add a proxy endpoint for the frontend.
-  ### A typical reason to do this is to handle HTTPS and CORS for internal services.
-  # '/test':
-  #   target: 'https://example.com'
-  #   changeOrigin: true
-
-# Reference documentation http://backstage.io/docs/features/techdocs/configuration
-# Note: After experimenting with basic setup, use CI/CD to generate docs
-# and an external cloud storage when deploying TechDocs for production use-case.
-# https://backstage.io/docs/features/techdocs/how-to-guides#how-to-migrate-from-techdocs-basic-to-recommended-deployment-approach
-techdocs:
-  builder: 'local' # Alternatives - 'external'
-  generator:
-    runIn: 'docker' # Alternatives - 'local'
-  publisher:
-    type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
+      token: ${GITHUB_TOKEN}
 
 auth:
-  # see https://backstage.io/docs/auth/ to learn about auth providers
   environment: development
   providers:
     github:
       development:
-        clientId: ddf95046851cff3e5099
-        clientSecret: c50e985da556fd9c8438230df357aaa4a1ec8566
+        clientId: ${GITHUB_DEVELOPMENT_CLIENT_ID}
+        clientSecret: ${GITHUB_DEVELOPMENT_CLIENT_SECRET}
+        # clientId: ddf95046851cff3e5099
+        # clientSecret: c50e985da556fd9c8438230df357aaa4a1ec8566
 
-scaffolder:
-  # see https://backstage.io/docs/features/software-templates/configuration for software template options
+  # environment: production
+  # providers:
+  #   github:
+  #     development:
+  #       clientId: ${GITHUB_PRODUCTION_CLIENT_ID}
+  #       clientSecret: ${GITHUB_PRODUCTION_CLIENT_SECRET}
 
 catalog:
   import:
     entityFilename: catalog-info.yaml
     pullRequestBranchName: backstage-integration
   rules:
-    - allow: [Component, System, API, Group, User, Resource, Location]
+    - allow: [Component, API, System, Domain, Resource, Location, User, Group]
   locations:
-    # Local example data, file locations are relative to the backend process, typically `packages/backend`
-    - type: file
-      target: ../../examples/entities.yaml
+    # Backstage example components
+    - type: url
+      target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all-components.yaml
 
+    # Backstage example systems
+    - type: url
+      target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all-systems.yaml
+
+    # Backstage example APIs
+    - type: url
+      target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all-apis.yaml
+
+    # Backstage example organization groups
+    - type: url
+      target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/acme/org.yaml
+
+    # Backstage example domains
+    - type: url
+      target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all-domains.yaml
+
+    # Backstage example resources
+    - type: url
+      target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all-resources.yaml
+
+    # The backstage demo deployment (this)
+    - type: url
+      target: https://github.com/backstage/demo/blob/master/catalog-info.yaml
+
+    # The backstage library repository
+    - type: url
+      target: https://github.com/backstage/backstage/blob/master/catalog-info.yaml
+    
     # Backstage template
     - type: file
       target: ../../plugins/scaffolder-backend/templates/all-templates.yaml
       rules:
         - allow: [Template]
 
-    # Local example organizational data
-    - type: file
-      target: ../../examples/org.yaml
-      rules:
-        - allow: [User, Group]
+costInsights:
+  engineerCost: 200000
+  products:
+    computeEngine:
+      name: Compute Engine
+      icon: compute
+    cloudStorage:
+      name: Cloud Storage
+      icon: storage
+    bigQuery:
+      name: BigQuery
+      icon: search
+  metrics:
+    DAU:
+      name: Daily Active Users
+      default: true
+    MSC:
+      name: Monthly Subscribers
 
-    ## Uncomment these lines to add more example data
-    # - type: url
-    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
-
-    ## Uncomment these lines to add an example org
-    # - type: url
-    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/acme-corp.yaml
-    #   rules:
-    #     - allow: [User, Group]
+# app-config.heroku.yaml replaces these values
+# These configs here are required for config validation in CI to pass
+techdocs:
+  builder: 'external'
+  generator:
+    runIn: 'local'
+  publisher:
+    type: 'local'

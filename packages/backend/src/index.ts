@@ -6,69 +6,70 @@
  * Happy hacking!
  */
 
-import Router from 'express-promise-router';
 import {
-  createServiceBuilder,
-  loadBackendConfig,
-  getRootLogger,
-  useHotMemoize,
-  notFoundHandler,
   CacheManager,
   DatabaseManager,
+  ServerTokenManager,
   SingleHostDiscovery,
   UrlReaders,
-  ServerTokenManager,
+  createServiceBuilder,
+  getRootLogger,
+  loadBackendConfig,
+  notFoundHandler,
+  useHotMemoize,
 } from '@backstage/backend-common';
-import { TaskScheduler } from '@backstage/backend-tasks';
+
 import { Config } from '@backstage/config';
-import app from './plugins/app';
-import auth from './plugins/auth';
-import catalog from './plugins/catalog';
-import scaffolder from './plugins/scaffolder';
-import proxy from './plugins/proxy';
-import techdocs from './plugins/techdocs';
-import search from './plugins/search';
 import { PluginEnvironment } from './types';
+import Router from 'express-promise-router';
 import { ServerPermissionClient } from '@backstage/plugin-permission-node';
 import { DefaultIdentityClient } from '@backstage/plugin-auth-node';
+import { TaskScheduler } from '@backstage/backend-tasks';
+import app from './plugins/app';
+import auth from './plugins/auth';
+import badges from './plugins/badges';
+import catalog from './plugins/catalog';
+import explore from './plugins/explore';
+import proxy from './plugins/proxy';
+import search from './plugins/search';
+import techdocs from './plugins/techdocs';
+import todo from './plugins/todo';
 import permission from './plugins/permission';
 import secretManager from './plugins/secretManager';
 
 function makeCreateEnv(config: Config) {
   const root = getRootLogger();
   const reader = UrlReaders.default({ logger: root, config });
+  root.info(`Created UrlReader ${reader}`);
   const discovery = SingleHostDiscovery.fromConfig(config);
-  const cacheManager = CacheManager.fromConfig(config);
-  const databaseManager = DatabaseManager.fromConfig(config, { logger: root });
   const tokenManager = ServerTokenManager.fromConfig(config, { logger: root });
-  const taskScheduler = TaskScheduler.fromConfig(config);
-
-  const identity = DefaultIdentityClient.create({
-    discovery,
-  });
+  const databaseManager = DatabaseManager.fromConfig(config);
   const permissions = ServerPermissionClient.fromConfig(config, {
     discovery,
     tokenManager,
   });
-
-  root.info(`Created UrlReader ${reader}`);
+  const identity = DefaultIdentityClient.create({
+    discovery,
+  });
+  const cacheManager = CacheManager.fromConfig(config);
+  const taskScheduler = TaskScheduler.fromConfig(config);
 
   return (plugin: string): PluginEnvironment => {
     const logger = root.child({ type: 'plugin', plugin });
+    const scheduler = taskScheduler.forPlugin(plugin);
     const database = databaseManager.forPlugin(plugin);
     const cache = cacheManager.forPlugin(plugin);
-    const scheduler = taskScheduler.forPlugin(plugin);
     return {
       logger,
       database,
-      cache,
       config,
       reader,
       discovery,
       tokenManager,
-      scheduler,
       permissions,
-      identity,
+      scheduler,
+      cache,
+      identity
     };
   };
 }
@@ -81,26 +82,28 @@ async function main() {
   const createEnv = makeCreateEnv(config);
 
   const catalogEnv = useHotMemoize(module, () => createEnv('catalog'));
-  const scaffolderEnv = useHotMemoize(module, () => createEnv('scaffolder'));
   const authEnv = useHotMemoize(module, () => createEnv('auth'));
   const proxyEnv = useHotMemoize(module, () => createEnv('proxy'));
-  const techdocsEnv = useHotMemoize(module, () => createEnv('techdocs'));
   const searchEnv = useHotMemoize(module, () => createEnv('search'));
+  const techdocsEnv = useHotMemoize(module, () => createEnv('techdocs'));
+  const todoEnv = useHotMemoize(module, () => createEnv('todo'));
   const appEnv = useHotMemoize(module, () => createEnv('app'));
+  const badgesEnv = useHotMemoize(module, () => createEnv('badges'));
+  const exploreEnv = useHotMemoize(module, () => createEnv('explore'));
   const permissionEnv = useHotMemoize(module, () => createEnv('permission'));
   const secretManagerEnv = useHotMemoize(module, () => createEnv('secretManager'));
 
   const apiRouter = Router();
   apiRouter.use('/catalog', await catalog(catalogEnv));
-  apiRouter.use('/scaffolder', await scaffolder(scaffolderEnv));
   apiRouter.use('/auth', await auth(authEnv));
-  apiRouter.use('/techdocs', await techdocs(techdocsEnv));
-  apiRouter.use('/proxy', await proxy(proxyEnv));
   apiRouter.use('/search', await search(searchEnv));
+  apiRouter.use('/techdocs', await techdocs(techdocsEnv));
+  apiRouter.use('/todo', await todo(todoEnv));
+  apiRouter.use('/proxy', await proxy(proxyEnv));
+  apiRouter.use('/badges', await badges(badgesEnv));
+  apiRouter.use('/explore', await explore(exploreEnv));
   apiRouter.use('/permission', await permission(permissionEnv));
   apiRouter.use('/secretManager', await secretManager(secretManagerEnv));
-
-  // Add backends ABOVE this line; this 404 handler is the catch-all fallback
   apiRouter.use(notFoundHandler());
 
   const service = createServiceBuilder(module)
