@@ -93,7 +93,7 @@ catalog:
     
     # Backstage template
     - type: file
-      target: ../../plugins/scaffolder-backend/templates/all-templates.yaml
+      target: ../../templates/all-templates.yaml
       rules:
         - allow: [Template]
 
