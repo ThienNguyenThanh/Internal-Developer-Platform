@@ -45,17 +45,33 @@ export default async function createPlugin({
               );
             }
 
-            let userEntityRef;
+            let userEntityRef = {
+                  kind: 'User',
+                  name: userId,
+                  namespace: 'default',
+            };
+
+            let ownershipEntityRef = {
+              kind: 'User',
+              name: userId,
+              namespace: 'default',
+            };
             if(userId == 'ThienNguyenThanh'){
-              userEntityRef = {
+              ownershipEntityRef = {
                 kind: 'User',
-                name: userId,
-                namespace: 'admin',
+                name: 'admin',
+                namespace: 'default',
+              };
+            }else if(userId == 'S3817852'){
+              ownershipEntityRef = {
+                kind: 'User',
+                name: 'developer',
+                namespace: 'default',
               };
             }else{
-              userEntityRef = {
+              ownershipEntityRef = {
                 kind: 'User',
-                name: userId,
+                name: 'viewer',
                 namespace: 'default',
               };
             }
@@ -64,10 +80,14 @@ export default async function createPlugin({
                                             )}:${userEntityRef.namespace.toLocaleLowerCase('en-US',
                                             )}/${userEntityRef.name.toLocaleLowerCase('en-US')}`
 
+            const stringifyOwnershipEntityRef = `${ownershipEntityRef.kind.toLocaleLowerCase('en-US',
+                                                )}:${ownershipEntityRef.namespace.toLocaleLowerCase('en-US',
+                                                )}/${ownershipEntityRef.name.toLocaleLowerCase('en-US')}`
+
             return ctx.issueToken({
               claims: {
                 sub: stringifyUserEntityRef,
-                ent: [stringifyUserEntityRef],
+                ent: [stringifyOwnershipEntityRef, stringifyUserEntityRef],
               },
             });
           },

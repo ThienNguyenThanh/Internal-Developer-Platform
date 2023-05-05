@@ -8,6 +8,10 @@ import {
   catalogPlugin,
 } from '@backstage/plugin-catalog';
 import {
+  CatalogImportPage,
+  catalogImportPlugin,
+} from '@backstage/plugin-catalog-import';
+import {
   CatalogGraphPage,
   catalogGraphPlugin,
 } from '@backstage/plugin-catalog-graph';
@@ -26,7 +30,7 @@ import {
 } from '@backstage/plugin-techdocs';
 import { darkTheme, lightTheme } from '@backstage/theme';
 
-import { ScaffolderPage } from '@backstage/plugin-scaffolder';
+import { ScaffolderPage, scaffolderPlugin } from '@backstage/plugin-scaffolder';
 import { ApiExplorerPage } from '@backstage/plugin-api-docs';
 import { GraphiQLPage } from '@backstage/plugin-graphiql';
 import React from 'react';
@@ -45,6 +49,9 @@ import { SignInPage } from '@backstage/core-components';
 import { githubAuthApiRef } from '@backstage/core-plugin-api';
 import { HomepageCompositionRoot } from '@backstage/plugin-home';
 import { HomePage } from './components/home/HomePage';
+import { RequirePermission } from '@backstage/plugin-permission-react';
+import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
+import { TodoListPage } from '@internal/plugin-todo-list';
 
 const app = createApp({
   apis,
@@ -73,6 +80,9 @@ const app = createApp({
     });
     bind(catalogGraphPlugin.externalRoutes, {
       catalogEntity: catalogPlugin.routes.catalogEntity,
+    });
+    bind(scaffolderPlugin.externalRoutes, {
+      registerComponent: catalogImportPlugin.routes.importPage,
     });
     bind(orgPlugin.externalRoutes, {
       catalogIndex: catalogPlugin.routes.catalogIndex,
@@ -135,6 +145,14 @@ const routes = (
       element={<CostInsightsLabelDataflowInstructionsPage />}
     />
     <Route path="/create" element={<ScaffolderPage />} />
+    <Route
+      path="/catalog-import"
+      element={
+        <RequirePermission permission={catalogEntityCreatePermission}>
+          <CatalogImportPage />
+        </RequirePermission>
+      }
+    />
     <Route path="/docs" element={<TechDocsIndexPage />} />
     <Route
       path="/docs/:namespace/:kind/:name/*"
@@ -146,6 +164,7 @@ const routes = (
       {searchPage}
     </Route>
     <Route path="/settings" element={<UserSettingsPage />} />
+    <Route path="/todo-list" element={<TodoListPage />} />
     <Route path="/secret-manager" element={<SecretManagerPage />} />
     <Route
       path="/tech-radar"

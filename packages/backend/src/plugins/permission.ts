@@ -13,35 +13,55 @@ import {
 import { Router } from 'express';
 import { PluginEnvironment } from '../types';
 import { isPermission } from '@backstage/plugin-permission-common';
+// import {
+//   todoListCreatePermission,
+//   todoListUpdatePermission,
+//   secretReadPermission
+// } from '@internal/plugin-secret-manager-common';
+// import {
+//   todoListConditions,
+//   createTodoListConditionalDecision,
+// } from '@internal/plugin-secret-manager-backend';
+
 import {
-  todoListCreatePermission,
   todoListUpdatePermission,
-  secretReadPermission
-} from '@internal/plugin-secret-manager-common';
+  todoListReadPermission,
+} from '@internal/plugin-todo-list-common';
 import {
   todoListConditions,
   createTodoListConditionalDecision,
-} from '@internal/plugin-secret-manager-backend';
+} from '@internal/plugin-todo-list-backend';
 
 class TestPermissionPolicy implements PermissionPolicy {
   async handle(
     request: PolicyQuery,
-    user?: BackstageIdentityResponse,
+    user: BackstageIdentityResponse,
   ): Promise<PolicyDecision> {
-    if (isPermission(request.permission, todoListCreatePermission)) {
-      return {
-        result: AuthorizeResult.ALLOW,
-      };
-    }
+    // if (isPermission(request.permission, todoListCreatePermission)) {
+    //   return {
+    //     result: AuthorizeResult.ALLOW,
+    //   };
+    // }
+
+    // if (
+    //   isPermission(request.permission, todoListUpdatePermission)
+    // ) {
+    //   return createTodoListConditionalDecision(
+    //     request.permission,
+    //     todoListConditions.isOwner({
+    //       userId: user?.identity.userEntityRef
+    //     }),
+    //   );
+    // }
 
     if (
       isPermission(request.permission, todoListUpdatePermission) ||
-      isPermission(request.permission, secretReadPermission)
+      isPermission(request.permission, todoListReadPermission)
     ) {
       return createTodoListConditionalDecision(
         request.permission,
         todoListConditions.isOwner({
-          userId: user?.identity.userEntityRef ?? '',
+          userId: user?.identity.ownershipEntityRefs ?? '',
         }),
       );
     }

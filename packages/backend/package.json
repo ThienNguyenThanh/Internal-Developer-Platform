@@ -43,6 +43,8 @@
     "@backstage/plugin-todo-backend": "^0.1.41",
     "@internal/plugin-secret-manager-backend": "workspace:^",
     "@internal/plugin-secret-manager-common": "workspace:^",
+    "@internal/plugin-todo-list-backend": "workspace:^",
+    "@internal/plugin-todo-list-common": "workspace:^",
     "app": "^0.0.0",
     "better-sqlite3": "^7.5.0",
     "dockerode": "^3.2.1",

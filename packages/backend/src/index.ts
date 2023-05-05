@@ -34,6 +34,7 @@ import proxy from './plugins/proxy';
 import search from './plugins/search';
 import techdocs from './plugins/techdocs';
 import todo from './plugins/todo';
+import todoList from './plugins/todolist';
 import permission from './plugins/permission';
 import secretManager from './plugins/secretManager';
 
@@ -87,6 +88,7 @@ async function main() {
   const searchEnv = useHotMemoize(module, () => createEnv('search'));
   const techdocsEnv = useHotMemoize(module, () => createEnv('techdocs'));
   const todoEnv = useHotMemoize(module, () => createEnv('todo'));
+  const todoListEnv = useHotMemoize(module, () => createEnv('todolist'));
   const appEnv = useHotMemoize(module, () => createEnv('app'));
   const badgesEnv = useHotMemoize(module, () => createEnv('badges'));
   const exploreEnv = useHotMemoize(module, () => createEnv('explore'));
@@ -99,6 +101,7 @@ async function main() {
   apiRouter.use('/search', await search(searchEnv));
   apiRouter.use('/techdocs', await techdocs(techdocsEnv));
   apiRouter.use('/todo', await todo(todoEnv));
+  apiRouter.use('/todolist', await todoList(todoListEnv));
   apiRouter.use('/proxy', await proxy(proxyEnv));
   apiRouter.use('/badges', await badges(badgesEnv));
   apiRouter.use('/explore', await explore(exploreEnv));
