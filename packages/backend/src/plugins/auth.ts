@@ -87,7 +87,7 @@ export default async function createPlugin({
             return ctx.issueToken({
               claims: {
                 sub: stringifyUserEntityRef,
-                ent: [stringifyOwnershipEntityRef, stringifyUserEntityRef],
+                ent: [stringifyOwnershipEntityRef],
               },
             });
           },

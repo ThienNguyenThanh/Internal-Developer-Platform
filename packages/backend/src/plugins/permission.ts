@@ -60,7 +60,7 @@ class TestPermissionPolicy implements PermissionPolicy {
     ) {
       return createTodoListConditionalDecision(
         request.permission,
-        todoListConditions.isOwner({
+        todoListConditions.isVisible({
           userId: user?.identity.ownershipEntityRefs ?? '',
         }),
       );

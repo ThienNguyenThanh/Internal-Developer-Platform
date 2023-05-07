@@ -39,6 +39,18 @@ export type SecretInfo = {
   viewers: string;
 };
 
+export type SecretForm = {
+  secretName: string; // required
+  description?: string;
+  secretString?: string;
+  tags?: [ // TagListType
+    { // Tag
+      key: string;
+      value: string;
+    }
+  ]
+};
+
 type TodosTableProps = {
   todos: Todo[];
   onEdit(todo: Todo): any;

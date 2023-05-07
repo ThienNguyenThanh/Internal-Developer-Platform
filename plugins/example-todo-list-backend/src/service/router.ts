@@ -18,8 +18,8 @@ import { errorHandler } from '@backstage/backend-common';
 import express from 'express';
 import Router from 'express-promise-router';
 import { Logger } from 'winston';
-import { add, update, getAllSecret, SecretFilter, getSecret } from './todos';
-import { rules, viewerRules } from './rules';
+import { add, update, getSecretsForAdmin,getSecretsForDev, getSecretsForViewer ,SecretFilter, getSecret, createSecret } from './todos';
+import { rules } from './rules';
 import { InputError, NotAllowedError } from '@backstage/errors';
 import { getBearerTokenFromAuthorizationHeader, IdentityApi } from '@backstage/plugin-auth-node';
 import { PermissionEvaluator, AuthorizeResult } from '@backstage/plugin-permission-common';
@@ -66,7 +66,7 @@ export async function createRouter(
       return resourceRefs.map(getSecret);
     },
     resourceType: TODO_LIST_RESOURCE_TYPE,
-    rules: Object.values(viewerRules),
+    rules: Object.values(rules),
   });
 
   const router = Router();
@@ -104,9 +104,11 @@ export async function createRouter(
 
   const secretTransformConditions: ConditionTransformer<SecretFilter> = createConditionTransformer(Object.values(rules));
   router.get('/secret',async (req, res) => {
-    // const user = await identity.getIdentity({ request: req });
-    // console.log(`User is ${user?.identity.ownershipEntityRefs}`)
+    const user = await identity.getIdentity({ request: req });
+    const ownership = user?.identity.ownershipEntityRefs[0]
+    const author = user?.identity.userEntityRef ?? 'unrecognized-user';
     // if
+    console.log(`author is ${author}`)
 
     const token = getBearerTokenFromAuthorizationHeader(
       req.header('authorization'),
@@ -123,11 +125,20 @@ export async function createRouter(
     }
     if (decision.result === AuthorizeResult.CONDITIONAL) {
       const filter = secretTransformConditions(decision.conditions);
-      res.json(await getAllSecret(filter));
-    } else {
-      res.json(await getAllSecret());
-    }
-    // res.json(await getAllSecret());
+      // res.json(await getSecretsForAdmin());
+
+
+      // Check ownership for authorized page.
+      if(ownership?.includes('admin')){
+        res.json(await getSecretsForAdmin(author));
+      } else if(ownership?.includes('developer')){
+        res.json(await getSecretsForDev(author, filter ));
+      } else {
+        res.json(await getSecretsForViewer(filter));
+      }
+      
+    } 
+
   })
 
   router.post('/todos', async (req, res) => {
@@ -135,25 +146,28 @@ export async function createRouter(
 
     const user = await identity.getIdentity({ request: req });
     author = user?.identity.userEntityRef;
-    const token = getBearerTokenFromAuthorizationHeader(
-      req.header('authorization'),
-    );
-    const decision = (
-      await permissions.authorize([{ permission: todoListCreatePermission }], {
-      token,
-      })
-    )[0];
 
-    if (decision.result === AuthorizeResult.DENY) {
-      throw new NotAllowedError('Unauthorized');
-    }
+    // console.log(`Resquest body is ${JSON.stringify(req.body)}`)
+    await createSecret(req.body, author);
+    // const token = getBearerTokenFromAuthorizationHeader(
+    //   req.header('authorization'),
+    // );
+    // const decision = (
+    //   await permissions.authorize([{ permission: todoListCreatePermission }], {
+    //   token,
+    //   })
+    // )[0];
 
-    if (!isTodoCreateRequest(req.body)) {
-      throw new InputError('Invalid payload');
-    }
+    // if (decision.result === AuthorizeResult.DENY) {
+    //   throw new NotAllowedError('Unauthorized');
+    // }
 
-    const todo = add({ title: req.body.title, author });
-    res.json(todo);
+    // if (!isTodoCreateRequest(req.body)) {
+    //   throw new InputError('Invalid payload');
+    // }
+
+    // const todo = add({ title: req.body.title, author });
+    // res.json(todo);
   });
 
   router.put('/todos', async (req, res) => {

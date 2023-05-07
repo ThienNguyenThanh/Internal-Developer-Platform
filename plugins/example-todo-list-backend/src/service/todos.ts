@@ -15,7 +15,7 @@
  */
 import { v4 as uuid } from 'uuid';
 import { NotFoundError } from '@backstage/errors';
-import { SecretsManagerClient, ListSecretsCommand } from "@aws-sdk/client-secrets-manager";
+import { SecretsManagerClient, ListSecretsCommand, CreateSecretCommand } from "@aws-sdk/client-secrets-manager";
 // import {dotev} from 'dotenv';
 
 // dotev.config();
@@ -34,6 +34,18 @@ export type Todo = {
   author?: string;
   id: string;
   timestamp: number;
+};
+
+export type SecretForm = {
+  secretName: string; // required
+  description?: string;
+  secretString?: string;
+  tags?: [ // TagListType
+    { // Tag
+      key: string;
+      value: string;
+    }
+  ]
 };
 
 export type TodoFilter = {
@@ -122,6 +134,45 @@ export function getSecret(id: string) {
   return secrets[id];
 }
 
+export async function createSecret(newScret: SecretForm, owner?: string) {
+  // let response:SecretForm[] = [];
+   
+    const client = new SecretsManagerClient({ 
+      region: "us-east-1",
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY ?? 'foo',
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'foo'
+      }});
+
+    const command = new CreateSecretCommand({
+      Name: newScret.secretName,
+      Description: newScret.description ,
+      Tags: [
+        { 
+          Key: "owner",
+          Value: owner
+        },
+        { 
+          Key: "viewer",
+          Value: owner
+        }
+      ],
+      SecretString: newScret.secretString
+    });
+    try {
+      const results = await client.send(command);
+
+      console.log(results);
+      
+    } catch (err) {
+      console.error(err);
+    }
+  
+  // console.log(`response is ${response}`)
+
+  // return response;
+}
+
 export function update({ id, title }: { id: string; title: string }) {
   let todo = todos[id];
   if (!todo) {
@@ -140,7 +191,135 @@ export function getAll(filter?: TodoFilters) {
 }
 
 
-export async function getAllSecret(filter?: SecretFilters) {
+export async function getSecretsForAdmin(viewer:string) {
+  
+  let response:SecretInfo[] = [];
+   
+    const client = new SecretsManagerClient({ 
+      region: "us-east-1",
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY ?? 'foo',
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'foo',
+      }});
+    const command = new ListSecretsCommand({
+      Filters: [ 
+        { 
+            "Key": "tag-key",
+            "Values": ["viewer"]
+        },
+        { 
+          "Key": "all",
+          "Values": [viewer]
+        }
+      ],
+      MaxResults: 10,
+    });
+    try {
+      const results = await client.send(command);
+      // console.log(results.SecretList);
+      let data = results.SecretList;
+      // let newScret = {} as SecretInfo;
+      for(let i=0; i< 3; i++) {
+        if(data){
+          // newScret.id =   data[i].Name!;
+          // newScret.ARN =   data[i].ARN!;
+          // newScret.keyName =   data[i].Name!;
+          // newScret.lastChangedDate =   data[i].LastChangedDate!;
+          // newScret.author =  "user:default/thiennguyenthanh";
+          // response.push(newScret)
+          response.push({
+            "id":  data[i].Name!,
+            "ARN": data[i].ARN!,
+            "keyName": data[i].Name!,
+            "lastChangedDate": 132,
+            "author": "user:default/thiennguyenthanh",
+            "viewers": "user:default/s3817852",
+          })
+
+          // let newScret:Omit<SecretInfo, 'id' | 'lastChangedDate'> = {
+          //   ARN: data[i].ARN!,
+          //   keyName: data[i].Name!,
+          //   author: "user:default/thiennguyenthanh",
+          //   viewers: "user:default/thiennguyenthanh, user:default/s3817852"
+          // };
+
+          // const id = uuid();
+
+          // const obj: SecretInfo = { ...newScret, id, lastChangedDate: Date.now() };
+          // secrets[id] = obj;
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  
+  // console.log(`response is ${response}`)
+
+  return response;
+  // return Object.values(response)
+
+  //   .sort((a, b) => b.lastChangedDate - a.lastChangedDate);
+}
+
+export async function getSecretsForDev(viewer:string, filter?: SecretFilters ) {
+  
+  let response:SecretInfo[] = [];
+   
+    const client = new SecretsManagerClient({ 
+      region: "us-east-1",
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY ?? 'foo',
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'foo',
+      }});
+    const command = new ListSecretsCommand({
+      Filters: [ 
+        { 
+          "Key": "tag-key",
+          "Values": ["viewer"]
+      },
+      { 
+        "Key": "all",
+        "Values": [viewer]
+      }
+      ],
+      MaxResults: 10,
+    });
+    try {
+      const results = await client.send(command);
+      // console.log(results.SecretList);
+      let data = results.SecretList;
+      // let newScret = {} as SecretInfo;
+      for(let i=0; i< 3; i++) {
+        if(data){
+          // newScret.id =   data[i].Name!;
+          // newScret.ARN =   data[i].ARN!;
+          // newScret.keyName =   data[i].Name!;
+          // newScret.lastChangedDate =   data[i].LastChangedDate!;
+          // newScret.author =  "user:default/thiennguyenthanh";
+          // response.push(newScret)
+          response.push({
+            "id":  data[i].Name!,
+            "ARN": data[i].ARN!,
+            "keyName": data[i].Name!,
+            "lastChangedDate": 132,
+            "author": "user:default/thiennguyenthanh",
+            "viewers": "user:default/s3817852",
+          })
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  
+  // console.log(`response is ${response}`)
+
+  return response;
+  // return Object.values(response)
+  //   .filter(value => matchesSecret(value, filter))
+  //   .sort((a, b) => b.lastChangedDate - a.lastChangedDate);
+}
+
+export async function getSecretsForViewer(filter?: SecretFilters) {
   
   let response:SecretInfo[] = [];
    
@@ -180,18 +359,6 @@ export async function getAllSecret(filter?: SecretFilters) {
             "author": "user:default/thiennguyenthanh",
             "viewers": "user:default/s3817852",
           })
-
-          // let newScret:Omit<SecretInfo, 'id' | 'lastChangedDate'> = {
-          //   ARN: data[i].ARN!,
-          //   keyName: data[i].Name!,
-          //   author: "user:default/thiennguyenthanh",
-          //   viewers: "user:default/thiennguyenthanh, user:default/s3817852"
-          // };
-
-          // const id = uuid();
-
-          // const obj: SecretInfo = { ...newScret, id, lastChangedDate: Date.now() };
-          // secrets[id] = obj;
         }
       }
     } catch (err) {

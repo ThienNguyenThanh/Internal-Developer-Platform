@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 export { TodoList } from './TodoList';
-export type { Todo, SecretInfo } from './TodoList';
+export type { Todo, SecretInfo, SecretForm } from './TodoList';
