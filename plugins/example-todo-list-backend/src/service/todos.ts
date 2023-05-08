@@ -15,18 +15,20 @@
  */
 import { v4 as uuid } from 'uuid';
 import { NotFoundError } from '@backstage/errors';
-import { SecretsManagerClient, ListSecretsCommand, CreateSecretCommand } from "@aws-sdk/client-secrets-manager";
+import { SecretsManagerClient, ListSecretsCommand, CreateSecretCommand, UpdateSecretCommand, Tag } from "@aws-sdk/client-secrets-manager";
 // import {dotev} from 'dotenv';
 
 // dotev.config();
 
 export type SecretInfo = {
   id: string;
-  keyName: string;
+  secretName: string;
   ARN: string;
-  lastChangedDate: number;
-  author: string;
-  viewers: string;
+  lastChangedDate?: Date;
+  description?: string;
+  secretString?: string;
+  owner?: string,
+  viewer?: string,
 };
 
 export type Todo = {
@@ -40,12 +42,7 @@ export type SecretForm = {
   secretName: string; // required
   description?: string;
   secretString?: string;
-  tags?: [ // TagListType
-    { // Tag
-      key: string;
-      value: string;
-    }
-  ]
+  tags?: Tag[]
 };
 
 export type TodoFilter = {
@@ -142,6 +139,8 @@ export async function createSecret(newScret: SecretForm, owner?: string) {
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY ?? 'foo',
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'foo'
+       
+        
       }});
 
     const command = new CreateSecretCommand({
@@ -173,15 +172,38 @@ export async function createSecret(newScret: SecretForm, owner?: string) {
   // return response;
 }
 
-export function update({ id, title }: { id: string; title: string }) {
-  let todo = todos[id];
-  if (!todo) {
-    throw new NotFoundError('Item not found');
+export async function updateSecret(updateScret: SecretInfo) {
+  const client = new SecretsManagerClient({ 
+    region: "us-east-1",
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY ?? 'foo',
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'foo'
+      
+      
+    }});
+
+  const command = new UpdateSecretCommand({
+    SecretId: updateScret.secretName,
+    Description: updateScret.description ,
+    SecretString: updateScret.secretString
+  });
+  try {
+    const results = await client.send(command);
+
+    console.log(results);
+    
+  } catch (err) {
+    console.error(err);
   }
 
-  todo = { ...todo, title, timestamp: Date.now() };
-  todos[id] = todo;
-  return todo;
+  // let todo = todos[id];
+  // if (!todo) {
+  //   throw new NotFoundError('Item not found');
+  // }
+
+  // todo = { ...todo, title, timestamp: Date.now() };
+  // todos[id] = todo;
+  // return todo;
 }
 
 export function getAll(filter?: TodoFilters) {
@@ -200,6 +222,7 @@ export async function getSecretsForAdmin(viewer:string) {
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY ?? 'foo',
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'foo',
+       
       }});
     const command = new ListSecretsCommand({
       Filters: [ 
@@ -217,48 +240,41 @@ export async function getSecretsForAdmin(viewer:string) {
     try {
       const results = await client.send(command);
       // console.log(results.SecretList);
-      let data = results.SecretList;
-      // let newScret = {} as SecretInfo;
-      for(let i=0; i< 3; i++) {
-        if(data){
-          // newScret.id =   data[i].Name!;
-          // newScret.ARN =   data[i].ARN!;
-          // newScret.keyName =   data[i].Name!;
-          // newScret.lastChangedDate =   data[i].LastChangedDate!;
-          // newScret.author =  "user:default/thiennguyenthanh";
-          // response.push(newScret)
-          response.push({
-            "id":  data[i].Name!,
-            "ARN": data[i].ARN!,
-            "keyName": data[i].Name!,
-            "lastChangedDate": 132,
-            "author": "user:default/thiennguyenthanh",
-            "viewers": "user:default/s3817852",
-          })
+      if(results.SecretList){
+        let data = results.SecretList;
+        let tagViewerValue : string = '',
+            tagOwnerValue : string = '';
 
-          // let newScret:Omit<SecretInfo, 'id' | 'lastChangedDate'> = {
-          //   ARN: data[i].ARN!,
-          //   keyName: data[i].Name!,
-          //   author: "user:default/thiennguyenthanh",
-          //   viewers: "user:default/thiennguyenthanh, user:default/s3817852"
-          // };
+        // let newScret = {} as SecretInfo;
+        for(let i=0; i< data?.length; i++) {
+            
 
-          // const id = uuid();
-
-          // const obj: SecretInfo = { ...newScret, id, lastChangedDate: Date.now() };
-          // secrets[id] = obj;
+            data[i].Tags?.map((tag) => {
+              if(tag.Key == 'owner' && !tagOwnerValue){
+                tagOwnerValue = tag.Value ?? '';
+              }
+              if(tag.Key == 'viewer' && !tagViewerValue){
+                tagViewerValue = tag.Value ?? '';
+              }
+              
+            })
+            response.push({
+              "id":  data[i].Name!,
+              "ARN": data[i].ARN!,
+              "secretName": data[i].Name!,
+              "lastChangedDate": data[i].LastChangedDate,
+              "description": data[i].Description,
+              "owner": tagOwnerValue,
+              "viewer": tagViewerValue,         
+            })
+          
         }
-      }
+    }
     } catch (err) {
       console.error(err);
     }
-  
-  // console.log(`response is ${response}`)
 
   return response;
-  // return Object.values(response)
-
-  //   .sort((a, b) => b.lastChangedDate - a.lastChangedDate);
 }
 
 export async function getSecretsForDev(viewer:string, filter?: SecretFilters ) {
@@ -270,6 +286,7 @@ export async function getSecretsForDev(viewer:string, filter?: SecretFilters ) {
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY ?? 'foo',
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'foo',
+        
       }});
     const command = new ListSecretsCommand({
       Filters: [ 
@@ -286,24 +303,31 @@ export async function getSecretsForDev(viewer:string, filter?: SecretFilters ) {
     });
     try {
       const results = await client.send(command);
-      // console.log(results.SecretList);
-      let data = results.SecretList;
       // let newScret = {} as SecretInfo;
-      for(let i=0; i< 3; i++) {
+      let data = results.SecretList;
+      let tagViewerValue : string = '',
+          tagOwnerValue : string = '';
+            
+      for(let i=0; i< 4; i++) {
         if(data){
-          // newScret.id =   data[i].Name!;
-          // newScret.ARN =   data[i].ARN!;
-          // newScret.keyName =   data[i].Name!;
-          // newScret.lastChangedDate =   data[i].LastChangedDate!;
-          // newScret.author =  "user:default/thiennguyenthanh";
-          // response.push(newScret)
+          
+          data[i].Tags?.map((tag) => {
+            if(tag.Key == 'owner' && !tagOwnerValue){
+              tagOwnerValue = tag.Value ?? '';
+            }
+            if(tag.Key == 'viewer' && !tagViewerValue){
+              tagViewerValue = tag.Value ?? '';
+            }
+            
+          })
+
           response.push({
             "id":  data[i].Name!,
             "ARN": data[i].ARN!,
-            "keyName": data[i].Name!,
-            "lastChangedDate": 132,
-            "author": "user:default/thiennguyenthanh",
-            "viewers": "user:default/s3817852",
+            "secretName": data[i].Name!,
+            "lastChangedDate": data[i].LastChangedDate,
+            "owner": tagOwnerValue,
+            "viewer": tagViewerValue,    
           })
         }
       }
@@ -328,6 +352,7 @@ export async function getSecretsForViewer(filter?: SecretFilters) {
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY ?? 'foo',
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'foo',
+      
       }});
     const command = new ListSecretsCommand({
       Filters: [ 
@@ -342,24 +367,35 @@ export async function getSecretsForViewer(filter?: SecretFilters) {
       const results = await client.send(command);
       // console.log(results.SecretList);
       let data = results.SecretList;
-      // let newScret = {} as SecretInfo;
+      let tagViewerValue : string = '',
+          tagOwnerValue : string = '';
+
+        
       for(let i=0; i< 3; i++) {
         if(data){
-          // newScret.id =   data[i].Name!;
-          // newScret.ARN =   data[i].ARN!;
-          // newScret.keyName =   data[i].Name!;
-          // newScret.lastChangedDate =   data[i].LastChangedDate!;
-          // newScret.author =  "user:default/thiennguyenthanh";
-          // response.push(newScret)
+          
+          if(data){
+          
+            data[i].Tags?.map((tag) => {
+              if(tag.Key == 'owner' && !tagOwnerValue){
+                tagOwnerValue = tag.Value ?? '';
+              }
+              if(tag.Key == 'viewer' && !tagViewerValue){
+                tagViewerValue = tag.Value ?? '';
+              }
+              
+            })
+
           response.push({
             "id":  data[i].Name!,
             "ARN": data[i].ARN!,
-            "keyName": data[i].Name!,
-            "lastChangedDate": 132,
-            "author": "user:default/thiennguyenthanh",
-            "viewers": "user:default/s3817852",
+            "secretName": data[i].Name!,
+            "lastChangedDate": data[i].LastChangedDate,
+            "owner": tagOwnerValue,
+            "viewer": tagViewerValue,
           })
         }
+      }
       }
     } catch (err) {
       console.error(err);
@@ -367,10 +403,10 @@ export async function getSecretsForViewer(filter?: SecretFilters) {
   
   // console.log(`response is ${response}`)
 
-  // return response;
-  return Object.values(response)
-    .filter(value => matchesSecret(value, filter))
-    .sort((a, b) => b.lastChangedDate - a.lastChangedDate);
+  return response;
+  // return Object.values(response)
+  //   .filter(value => matchesSecret(value, filter))
+  //   .sort((a, b) => b.lastChangedDate - a.lastChangedDate);
 }
 
 // prepopulate the db

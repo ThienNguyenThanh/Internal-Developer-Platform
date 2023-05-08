@@ -23,6 +23,9 @@ import {
   useApi,
 } from '@backstage/core-plugin-api';
 import { Button } from '@material-ui/core';
+import { Tag } from "@aws-sdk/client-secrets-manager";
+import { RequirePermission } from '@backstage/plugin-permission-react';
+import { todoListUpdatePermission } from '@internal/plugin-todo-list-common';
 
 export type Todo = {
   title: string;
@@ -32,11 +35,13 @@ export type Todo = {
 };
 export type SecretInfo = {
   id: string;
-  keyName: string;
-  ARN: string;
-  lastChangedDate: number;
-  author: string;
-  viewers: string;
+  secretName: string;
+  ARN?: string;
+  lastChangedDate?: number;
+  description?: string;
+  secretString?: string;
+  owner?: string,
+  viewer?: string,
 };
 
 export type SecretForm = {
@@ -93,9 +98,9 @@ export function TodosTable({ todos, onEdit }: TodosTableProps) {
       title: 'Action',
       render: todo => {
         return (
-          <Button variant="contained" onClick={() => onEdit(todo)}>
-            Edit
-          </Button>
+            <Button variant="contained" onClick={() => onEdit(todo)}>
+              Edit
+            </Button>
         );
       },
     },
@@ -135,22 +140,21 @@ export const SecretList = ({ onEdit }: { onEdit(todo: SecretInfo): any }) => {
 
 export function SecretInfoTable({ secretInfos, onEdit }: SecretInfoTableProps) {
   const columns: TableColumn<SecretInfo>[] = [
-    { title: 'Key-Name', field: 'keyName' },
+    { title: 'Key-Name', field: 'secretName' },
     { title: 'ARN', field: 'ARN' },
-    {
-      title: 'Last edit',
-      field: 'lastChangedDate',
-      render: e => new Date(e.lastChangedDate).toLocaleString(),
-    },
-    { title: 'Owner', field: 'author' },
-    { title: 'Viewer', field:'viewers' },
+    { title: 'Last edit', field: 'lastChangedDate'},
+    { title: 'Owner', field: 'owner'},
+    { title: 'Viewer',field: 'viewer'},
     {
       title: 'Action',
       render: secretInfo => {
         return (
-          <Button variant="contained" onClick={() => onEdit(secretInfo)}>
+          <RequirePermission resourceRef='todo-item' permission={todoListUpdatePermission} errorPage={<></>}>
+            <Button variant="contained" onClick={() => onEdit(secretInfo)}>
             Edit
-          </Button>
+            </Button>
+          </RequirePermission>
+          
         );
       },
     },
@@ -159,7 +163,7 @@ export function SecretInfoTable({ secretInfos, onEdit }: SecretInfoTableProps) {
   return (
     <Table
       title="Secret Manager"
-      options={{ search: false, paging: false }}
+      options={{ search: false, paging: true }}
       columns={columns}
       data={secretInfos}
     />

@@ -54,14 +54,26 @@ class TestPermissionPolicy implements PermissionPolicy {
     //   );
     // }
 
+    // if (
+    //   isPermission(request.permission, todoListUpdatePermission) ||
+    //   isPermission(request.permission, todoListReadPermission)
+    // ) {
+    //   return createTodoListConditionalDecision(
+    //     request.permission,
+    //     todoListConditions.isVisible({
+    //       userId: user?.identity.ownershipEntityRefs ?? '',
+    //     }),
+    //   );
+    // }
+
     if (
       isPermission(request.permission, todoListUpdatePermission) ||
       isPermission(request.permission, todoListReadPermission)
     ) {
       return createTodoListConditionalDecision(
         request.permission,
-        todoListConditions.isVisible({
-          userId: user?.identity.ownershipEntityRefs ?? '',
+        todoListConditions.isOwner({
+          userId: user?.identity.userEntityRef ?? '',
         }),
       );
     }

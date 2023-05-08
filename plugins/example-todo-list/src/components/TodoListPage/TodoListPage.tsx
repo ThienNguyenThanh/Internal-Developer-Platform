@@ -79,14 +79,14 @@ export const TodoListPage = () => {
     }
   };
 
-  const handleEdit = async (todo: SecretInfo) => {
+  const handleEdit = async (updateSecret: SecretInfo) => {
     setEdit(undefined);
     try {
       const response = await fetch(
         `${await discoveryApi.getBaseUrl('todolist')}/todos`,
         {
           method: 'PUT',
-          body: JSON.stringify({ title: todo.keyName, id: todo.id }),
+          body: JSON.stringify(updateSecret),
           headers: {
             'Content-Type': 'application/json',
           },
@@ -133,7 +133,7 @@ export const TodoListPage = () => {
       </Content>
       {!!editElement && (
         <EditModal
-          todo={editElement}
+          updateSecret={editElement}
           onSubmit={handleEdit}
           onCancel={() => setEdit(undefined)}
         />
@@ -198,7 +198,6 @@ function CreateModal({
     <Dialog open>
       <DialogTitle id="form-dialog-title">Create Secret</DialogTitle>
       <DialogContent>
-        {/* <h3>Secret Name</h3> */}
         <TextField
           required
           label="Secret Name"
@@ -285,33 +284,70 @@ function CreateModal({
 }
 
 function EditModal({
-  todo,
+  updateSecret,
   onCancel,
   onSubmit,
 }: {
-  todo?: SecretInfo;
+  updateSecret: SecretInfo;
   onSubmit(t: SecretInfo): any;
   onCancel(): any;
 }) {
   const title = useRef('');
+  const description = useRef('');
+  const secretKey = useRef('');
+  const secretValue = useRef('');
   return (
     <Dialog open>
-      <DialogTitle id="form-dialog-title">Edit item</DialogTitle>
+      <DialogTitle id="form-dialog-title">Edit Secret</DialogTitle>
       <DialogContent>
-        <Input
-          placeholder="Write something here..."
-          defaultValue={todo?.keyName || ''}
-          onChange={e => (title.current = e.target.value)}
+        <TextField
+          label="Secret Name"
+          defaultValue={updateSecret.secretName || ''}
+          margin="dense"
+          fullWidth
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+        <TextField
+          label="Description"
+          defaultValue={updateSecret?.description || ''}
+          onChange={e => (description.current = e.target.value)}
           margin="dense"
           fullWidth
         />
+        <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            name="secret-key"
+            fullWidth
+            id="secret-key"
+            label="Secret Key"
+            onChange={e => (secretKey.current = e.target.value)}
+          />
+        </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              id="secret-value"
+              label="Secret Value"
+              name="secret-value"
+              onChange={e => (secretValue.current = e.target.value)}
+            />
+          </Grid>
+        </Grid>
       </DialogContent>
       <DialogActions>
         <Button color="primary" onClick={onCancel}>
           Cancel
         </Button>
         <Button
-          onClick={() => onSubmit({ ...todo!, keyName: title.current })}
+          onClick={() => onSubmit({
+            id: updateSecret.secretName,
+            secretName: updateSecret.secretName,
+            description: description.current,
+            secretString: `{"${secretKey.current}":"${secretValue.current}"}`,
+          })}
           color="primary"
         >
           Save

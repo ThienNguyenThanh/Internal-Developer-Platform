@@ -15,37 +15,37 @@ export const secretCreateTodoListPermissionRule = makeCreatePermissionRule<
   typeof TODO_LIST_RESOURCE_TYPE
 >();
 
-export const isVisible = secretCreateTodoListPermissionRule({
-  name: 'IS_VISIBLE',
-  description: 'Should visible only if user is in viewer list',
-  resourceType: TODO_LIST_RESOURCE_TYPE,
-  paramsSchema: z.object({
-    userId: z.array(z.string())
-  }),
-  apply: (resource: SecretInfo, { userId }) => {
-    return userId.includes(resource.viewers);
-  },
-  toQuery: ({ userId }) => {
-    return {
-      property: 'viewers',
-      values: userId,
-    };
-  },
-});
+// export const isVisible = secretCreateTodoListPermissionRule({
+//   name: 'IS_VISIBLE',
+//   description: 'Should visible only if user is in viewer list',
+//   resourceType: TODO_LIST_RESOURCE_TYPE,
+//   paramsSchema: z.object({
+//     userId: z.array(z.string())
+//   }),
+//   apply: (resource: SecretInfo, { userId }) => {
+//     return userId.includes(resource.viewers);
+//   },
+//   toQuery: ({ userId }) => {
+//     return {
+//       property: 'viewers',
+//       values: userId,
+//     };
+//   },
+// });
 
-export const isAuthor = secretCreateTodoListPermissionRule({
-  name: 'IS_AUTHOR',
-  description: 'Should allow only if the todo belongs to the user',
+export const isOwner = secretCreateTodoListPermissionRule({
+  name: 'IS_OWNER',
+  description: 'Should allow only if user is owner of secret',
   resourceType: TODO_LIST_RESOURCE_TYPE,
   paramsSchema: z.object({
-    userId: z.string().describe('User ID to match on the resource'),
+    userId: z.string()
   }),
   apply: (resource: SecretInfo, { userId }) => {
-    return resource.author === userId;
+    return resource.owner === userId;
   },
   toQuery: ({ userId }) => {
     return {
-      property: 'author',
+      property: 'owner',
       values: [userId],
     };
   },
@@ -69,6 +69,6 @@ export const isAuthor = secretCreateTodoListPermissionRule({
 //   },
 // });
 
-export const rules = { isVisible };
-export const authorRules = { isAuthor };
+export const rules = { isOwner };
+// export const ownerRules = { isOwner };
 // export const viewerRules = { isViewer };
