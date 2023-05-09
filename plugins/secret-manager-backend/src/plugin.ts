@@ -34,7 +34,7 @@ export const exampleTodoListPlugin = createBackendPlugin({
         identity: coreServices.identity,
         logger: coreServices.logger,
         httpRouter: coreServices.httpRouter,
-        permissions: coreServices.permissions
+        permissions: coreServices.permissions,
       },
       async init({ identity, logger, httpRouter, permissions }) {
         httpRouter.use(

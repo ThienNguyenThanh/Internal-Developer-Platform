@@ -15,7 +15,6 @@
  */
 import React, { useReducer, useRef, useState } from 'react';
 import {
-  Typography,
   Grid,
   TextField,
   Button,
@@ -29,16 +28,19 @@ import {
   Header,
   Page,
   Content,
+  ContentHeader,
   HeaderLabel,
+  SupportButton,
 } from '@backstage/core-components';
-import { SecretInfo, SecretList } from '../SecretManager';
+import { SecretForm, SecretInfo } from '../SecretManager';
 import {
   alertApiRef,
   discoveryApiRef,
   fetchApiRef,
   useApi,
 } from '@backstage/core-plugin-api';
-import { Todo } from '@internal/plugin-secret-manager-backend/src/service/todos';
+import { SecretList } from '../SecretManager/SecretManager';
+
 
 export const SecretManagerPage = () => {
   const discoveryApi = useApi(discoveryApiRef);
@@ -46,15 +48,16 @@ export const SecretManagerPage = () => {
   const alertApi = useApi(alertApiRef);
   const [key, refetchTodos] = useReducer(i => i + 1, 0);
   const [editElement, setEdit] = useState<SecretInfo | undefined>();
-  
+  const [createElement, setCreate] = useState<SecretForm | undefined>();
 
-  const handleAdd = async (title: string) => {
+  const handleAdd = async (newSecret: SecretForm) => {
+    setCreate(undefined);
     try {
       const response = await fetch(
         `${await discoveryApi.getBaseUrl('todolist')}/todos`,
         {
           method: 'POST',
-          body: JSON.stringify({ title }),
+          body: JSON.stringify(newSecret),
           headers: {
             'Content-Type': 'application/json',
           },
@@ -74,14 +77,14 @@ export const SecretManagerPage = () => {
     }
   };
 
-  const handleEdit = async (todo: SecretInfo) => {
+  const handleEdit = async (updateSecret: SecretInfo) => {
     setEdit(undefined);
     try {
       const response = await fetch(
         `${await discoveryApi.getBaseUrl('todolist')}/todos`,
         {
           method: 'PUT',
-          body: JSON.stringify({ title: todo.keyName, id: todo.id }),
+          body: JSON.stringify(updateSecret),
           headers: {
             'Content-Type': 'application/json',
           },
@@ -104,17 +107,23 @@ export const SecretManagerPage = () => {
   return (
     <Page themeId="tool">
       <Header
-        title="Secret Manager"
-        subtitle="List of secret key in AWS"
+        title="Welcome To Secret Manager!"
+        subtitle="Just a dashboard for your secrets"
       >
-        <HeaderLabel label="Owner" value="Team X" />
+        <HeaderLabel label="Owner" value="Team DTTD" />
         <HeaderLabel label="Lifecycle" value="Alpha" />
       </Header>
       <Content>
+        <ContentHeader title="Secret List">
+          <SupportButton>A description of your plugin goes here.</SupportButton>
+        </ContentHeader>
         <Grid container spacing={3} direction="column">
           <Grid item>
-            <AddTodo onAdd={handleAdd} />
+            <AddTodo onAdd={setCreate} />
           </Grid>
+          {/* <Grid item>
+            <TodoList key={key} onEdit={setEdit} />
+          </Grid> */}
           <Grid item>
             <SecretList key={key} onEdit={setEdit} />
           </Grid>
@@ -122,68 +131,218 @@ export const SecretManagerPage = () => {
       </Content>
       {!!editElement && (
         <EditModal
-          todo={editElement}
+          updateSecret={editElement}
           onSubmit={handleEdit}
           onCancel={() => setEdit(undefined)}
         />
       )}
+      {!!createElement && (
+        <CreateModal
+          onSubmit={handleAdd}
+          onCancel={() => setCreate(undefined)}
+        />
+      )}
+      
     </Page>
   );
 };
 
-function AddTodo({ onAdd }: { onAdd: (title: string) => any }) {
-  const title = useRef('');
+function AddTodo({ onAdd }: { onAdd(todo: SecretForm): any }) {
+  let inputSecret:SecretForm = {
+    secretName: '', // required
+    description: '',
+    secretString: 'string',
+    tags: [ // TagListType
+      { // Tag
+        key: '',
+        value: '',
+      }
+    ]
+  };
 
   return (
     <>
-      <Typography variant="body1">Add key</Typography>
       <Box
         component="span"
         alignItems="flex-end"
         display="flex"
         flexDirection="row"
       >
-        <TextField
-          placeholder="Write something here..."
-          onChange={e => (title.current = e.target.value)}
-        />
-        <Button variant="contained" onClick={() => onAdd(title.current)}>
-          Add
+        <Button variant="contained" onClick={() => onAdd(inputSecret)}>
+          Create Secret
         </Button>
       </Box>
     </>
   );
 }
 
-function EditModal({
-  todo,
+function CreateModal({
   onCancel,
   onSubmit,
 }: {
-  todo?: Todo;
-  secretValue?: string;
-  onSubmit(t: Todo): any;
+  onSubmit(t: SecretForm): any;
   onCancel(): any;
 }) {
-  const title = useRef('');
+  const secretName = useRef('');
+  const description = useRef('');
+  const secretKey = useRef('');
+  const secretValue = useRef('');
+  const tagKey = useRef('');
+  const tagValue = useRef('');
   return (
     <Dialog open>
-      <DialogTitle id="form-dialog-title">Edit item</DialogTitle>
+      <DialogTitle id="form-dialog-title">Create Secret</DialogTitle>
       <DialogContent>
         <TextField
-          placeholder="Write something here..."
-          defaultValue={todo?.keyName || ''}
-          onChange={e => (title.current = e.target.value)}
+          required
+          label="Secret Name"
+          placeholder="Ex: so-secret1"
+          defaultValue=''
+          onChange={e => (secretName.current = e.target.value)}
+          margin="dense"
+          fullWidth
+          autoFocus
+        />
+        <TextField
+          label="Description"
+          placeholder="Ex: Secret For DB"
+          defaultValue=''
+          onChange={e => (description.current = e.target.value)}
           margin="dense"
           fullWidth
         />
+        <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            name="secret-key"
+            fullWidth
+            id="secret-key"
+            label="Secret Key"
+            onChange={e => (secretKey.current = e.target.value)}
+          />
+        </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              id="secret-value"
+              label="Secret Value"
+              name="secret-value"
+              onChange={e => (secretValue.current = e.target.value)}
+            />
+          </Grid>
+        </Grid>
+        <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            autoComplete="given-name"
+            name="tag-key"
+            fullWidth
+            id="tag-key"
+            label="Tag Key"
+            onChange={e => (tagKey.current = e.target.value)}
+          />
+        </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              id="tag-value"
+              label="Tag Value"
+              name="tag-value"
+              onChange={e => (tagValue.current = e.target.value)}
+            />
+          </Grid>
+        </Grid>
+        
+        
       </DialogContent>
       <DialogActions>
         <Button color="primary" onClick={onCancel}>
           Cancel
         </Button>
         <Button
-          onClick={() => onSubmit({ ...todo!, keyName: title.current })}
+          onClick={() => onSubmit({
+            secretName: secretName.current,
+            description: description.current,
+            secretString: `{"${secretKey.current}":"${secretValue.current}"}`,
+            tags: [{
+              key: `${tagKey.current}`,
+              value: `${tagValue.current}`
+            }],
+          })}
+          color="primary"
+        >
+          Save
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+function EditModal({
+  updateSecret,
+  onCancel,
+  onSubmit,
+}: {
+  updateSecret: SecretInfo;
+  onSubmit(t: SecretInfo): any;
+  onCancel(): any;
+}) {
+  // const title = useRef('');
+  const description = useRef('');
+  const secretKey = useRef('');
+  const secretValue = useRef('');
+  return (
+    <Dialog open>
+      <DialogTitle id="form-dialog-title">Edit Secret</DialogTitle>
+      <DialogContent>
+        <TextField
+          label="Secret Name"
+          defaultValue={updateSecret.secretName || ''}
+          margin="dense"
+          fullWidth
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+        <TextField
+          label="Description"
+          defaultValue={updateSecret?.description || ''}
+          onChange={e => (description.current = e.target.value)}
+          margin="dense"
+          fullWidth
+        />
+        <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            name="secret-key"
+            fullWidth
+            id="secret-key"
+            label="Secret Key"
+            onChange={e => (secretKey.current = e.target.value)}
+          />
+        </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              id="secret-value"
+              label="Secret Value"
+              name="secret-value"
+              onChange={e => (secretValue.current = e.target.value)}
+            />
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button color="primary" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button
+          onClick={() => onSubmit({
+            id: updateSecret.secretName,
+            secretName: updateSecret.secretName,
+            description: description.current,
+            secretString: `{"${secretKey.current}":"${secretValue.current}"}`,
+          })}
           color="primary"
         >
           Save

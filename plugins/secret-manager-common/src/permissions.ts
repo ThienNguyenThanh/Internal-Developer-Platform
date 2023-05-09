@@ -16,19 +16,14 @@
 
 import { createPermission } from '@backstage/plugin-permission-common';
 
-
 export const TODO_LIST_RESOURCE_TYPE = 'todo-item';
+
+
 /**
  * An example of a permission.
  *
  * @public
  */
-export const secretReadPermission = createPermission({
-  name: 'todo.list.read',
-  attributes: { action: 'read' },
-  resourceType: TODO_LIST_RESOURCE_TYPE,
-});
-
 export const todoListCreatePermission = createPermission({
   name: 'todo.list.create',
   attributes: { action: 'create' },
@@ -40,6 +35,11 @@ export const todoListUpdatePermission = createPermission({
   resourceType: TODO_LIST_RESOURCE_TYPE,
 });
 
+export const todoListReadPermission = createPermission({
+  name: 'secret.manager.read',
+  attributes: { action: 'read' },
+  resourceType: TODO_LIST_RESOURCE_TYPE,
+});
 
 /**
  * List of all todo list permissions.
@@ -49,5 +49,5 @@ export const todoListUpdatePermission = createPermission({
 export const todoListPermissions = [
   todoListCreatePermission,
   todoListUpdatePermission,
-  secretReadPermission,
+  todoListReadPermission
 ];

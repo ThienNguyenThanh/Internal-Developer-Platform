@@ -18,15 +18,15 @@ import { errorHandler } from '@backstage/backend-common';
 import express from 'express';
 import Router from 'express-promise-router';
 import { Logger } from 'winston';
-import { add, updateSecret, getSecretsForAdmin,getSecretsForDev, getSecretsForViewer ,SecretFilter, getSecret, createSecret } from './todos';
+import { updateSecret, getSecretsForAdmin,getSecretsForDev, getSecretsForViewer , getSecret, createSecret } from './todos';
 import { rules } from './rules';
-import { InputError, NotAllowedError } from '@backstage/errors';
-import { getBearerTokenFromAuthorizationHeader, IdentityApi } from '@backstage/plugin-auth-node';
-import { PermissionEvaluator, AuthorizeResult } from '@backstage/plugin-permission-common';
+import { InputError } from '@backstage/errors';
+import { IdentityApi } from '@backstage/plugin-auth-node';
+import { PermissionEvaluator } from '@backstage/plugin-permission-common';
 import {
   createPermissionIntegrationRouter,
-  createConditionTransformer,
-  ConditionTransformer,
+  // createConditionTransformer,
+  // ConditionTransformer,
 } from '@backstage/plugin-permission-node';
 import {
   TODO_LIST_RESOURCE_TYPE,
@@ -58,7 +58,9 @@ export interface RouterOptions {
 export async function createRouter(
   options: RouterOptions,
 ): Promise<express.Router> {
-  const { logger, identity, permissions } = options;
+  // const { logger, identity, permissions } = options;
+  const { logger, identity } = options;
+
 
   const permissionIntegrationRouter = createPermissionIntegrationRouter({
     permissions: [todoListCreatePermission, todoListUpdatePermission, todoListReadPermission],
@@ -102,7 +104,7 @@ export async function createRouter(
   //   }
   // });
 
-  const secretTransformConditions: ConditionTransformer<SecretFilter> = createConditionTransformer(Object.values(rules));
+  // const secretTransformConditions: ConditionTransformer<SecretFilter> = createConditionTransformer(Object.values(rules));
   router.get('/secret',async (req, res) => {
     const user = await identity.getIdentity({ request: req });
     const ownership = user?.identity.ownershipEntityRefs[0]
@@ -175,7 +177,7 @@ export async function createRouter(
 
     await createSecret(req.body, author);
     // const todo = add({ title: req.body.title, author });
-    // res.json(todo);
+    res.json(req.body);
   });
 
   router.put('/todos', async (req, res) => {
@@ -184,14 +186,14 @@ export async function createRouter(
     // );
     const user = await identity.getIdentity({ request: req });
     const ownership = user?.identity.ownershipEntityRefs[0]
-    const author = user?.identity.userEntityRef ?? 'unrecognized-user';
+    // const author = user?.identity.userEntityRef ?? 'unrecognized-user';
 
     if (!req.body.secretName) {
       throw new InputError('Invalid Secret Name');
     }
 
     if(ownership?.includes('admin')){
-      await updateSecret(req.body)
+      res.json(await updateSecret(req.body))
     } else {
       throw new InputError('Do not have permission');
     }
@@ -217,12 +219,12 @@ export async function createRouter(
   return router;
 }
 
-function isTodoCreateRequest(request: any): request is { title: string } {
-  return typeof request?.title === 'string';
-}
+// function isTodoCreateRequest(request: any): request is { title: string } {
+//   return typeof request?.title === 'string';
+// }
 
-function isTodoUpdateRequest(
-  request: any,
-): request is { secretId: string } {
-  return typeof request.secretId === 'string' && request?.secretId;
-}
+// function isTodoUpdateRequest(
+//   request: any,
+// ): request is { secretId: string } {
+//   return typeof request.secretId === 'string' && request?.secretId;
+// }

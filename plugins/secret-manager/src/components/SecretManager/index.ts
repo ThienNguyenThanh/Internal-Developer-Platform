@@ -13,5 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { SecretList } from './SecretManager';
-export type { SecretInfo } from './SecretManager';
+export { TodoList } from './SecretManager';
+export type { Todo, SecretInfo, SecretForm } from './SecretManager';

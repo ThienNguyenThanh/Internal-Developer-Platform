@@ -1,9 +1,9 @@
-import { TODO_LIST_RESOURCE_TYPE } from '@internal/plugin-secret-manager-common';
+import { TODO_LIST_RESOURCE_TYPE } from '@internal/plugin-todo-list-common';
 import { createConditionExports } from '@backstage/plugin-permission-node';
 import { rules } from './service/rules';
 
 const { conditions, createConditionalDecision } = createConditionExports({
-  pluginId: 'secretManager',
+  pluginId: 'todolist',
   resourceType: TODO_LIST_RESOURCE_TYPE,
   rules,
 });

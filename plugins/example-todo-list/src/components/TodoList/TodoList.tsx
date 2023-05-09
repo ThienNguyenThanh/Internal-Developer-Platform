@@ -23,9 +23,9 @@ import {
   useApi,
 } from '@backstage/core-plugin-api';
 import { Button } from '@material-ui/core';
-import { Tag } from "@aws-sdk/client-secrets-manager";
-import { RequirePermission } from '@backstage/plugin-permission-react';
-import { todoListUpdatePermission } from '@internal/plugin-todo-list-common';
+// import { Tag } from "@aws-sdk/client-secrets-manager";
+// import { RequirePermission } from '@backstage/plugin-permission-react';
+// import { todoListUpdatePermission } from '@internal/plugin-todo-list-common';
 
 export type Todo = {
   title: string;
@@ -149,11 +149,10 @@ export function SecretInfoTable({ secretInfos, onEdit }: SecretInfoTableProps) {
       title: 'Action',
       render: secretInfo => {
         return (
-          <RequirePermission resourceRef='todo-item' permission={todoListUpdatePermission} errorPage={<></>}>
+    
             <Button variant="contained" onClick={() => onEdit(secretInfo)}>
             Edit
             </Button>
-          </RequirePermission>
           
         );
       },

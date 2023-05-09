@@ -26,7 +26,7 @@ import { rootRouteRef } from './routes';
  * @public
  */
 export const secretManagerPlugin = createPlugin({
-  id: 'secretManager',
+  id: 'secret-manager',
   routes: {
     root: rootRouteRef,
   },
@@ -39,7 +39,7 @@ export const secretManagerPlugin = createPlugin({
  */
 export const SecretManagerPage = secretManagerPlugin.provide(
   createRoutableExtension({
-    name: 'SecretManagerPage',
+    name: 'TodoListPage',
     component: () =>
       import('./components/SecretManagerPage').then(m => m.SecretManagerPage),
     mountPoint: rootRouteRef,

@@ -21,7 +21,7 @@ import {
   ServerTokenManager
 } from '@backstage/backend-common';
 import { DefaultIdentityClient } from '@backstage/plugin-auth-node';
-import { ServerPermissionClient } from '@backstage/plugin-permission-node'
+import { ServerPermissionClient } from '@backstage/plugin-permission-node';
 import { Server } from 'http';
 import { Logger } from 'winston';
 import { createRouter } from './router';
@@ -57,7 +57,7 @@ export async function startStandaloneServer(
 
   let service = createServiceBuilder(module)
     .setPort(options.port)
-    .addRouter('/secret-manager', router);
+    .addRouter('/todo-list', router);
   if (options.enableCors) {
     service = service.enableCors({ origin: 'http://localhost:3000' });
   }

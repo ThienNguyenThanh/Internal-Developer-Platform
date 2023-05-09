@@ -1,7 +1,7 @@
 import { makeCreatePermissionRule } from '@backstage/plugin-permission-node';
 import { TODO_LIST_RESOURCE_TYPE } from '@internal/plugin-todo-list-common';
 import { z } from 'zod';
-import { Todo, TodoFilter, SecretFilter, SecretInfo } from './todos';
+import {  SecretFilter, SecretInfo } from './todos';
 
 // export const createTodoListPermissionRule = makeCreatePermissionRule<
 //   Todo,

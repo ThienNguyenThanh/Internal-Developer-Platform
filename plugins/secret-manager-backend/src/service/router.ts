@@ -18,22 +18,22 @@ import { errorHandler } from '@backstage/backend-common';
 import express from 'express';
 import Router from 'express-promise-router';
 import { Logger } from 'winston';
-import { getAll,TodoFilter,getTodo } from './todos';
-import { NotAllowedError } from '@backstage/errors';
-import { getBearerTokenFromAuthorizationHeader, IdentityApi } from '@backstage/plugin-auth-node';
-import { PermissionEvaluator, AuthorizeResult } from '@backstage/plugin-permission-common';
+import {  updateSecret, getSecretsForAdmin,getSecretsForDev, getSecretsForViewer , getSecret, createSecret } from './todos';
+import { rules } from './rules';
+import { InputError } from '@backstage/errors';
+import {  IdentityApi } from '@backstage/plugin-auth-node';
+import { PermissionEvaluator } from '@backstage/plugin-permission-common';
 import {
   createPermissionIntegrationRouter,
-  createConditionTransformer,
-  ConditionTransformer,
+  // createConditionTransformer,
+  // ConditionTransformer,
 } from '@backstage/plugin-permission-node';
 import {
   TODO_LIST_RESOURCE_TYPE,
   todoListCreatePermission,
   todoListUpdatePermission,
-  secretReadPermission
+  todoListReadPermission
 } from '@internal/plugin-secret-manager-common';
-import { rules } from './rules';
 
 /**
  * Dependencies of the todo-list router
@@ -58,12 +58,12 @@ export interface RouterOptions {
 export async function createRouter(
   options: RouterOptions,
 ): Promise<express.Router> {
-  const { logger, permissions } = options;
+  const { logger, identity } = options;
 
   const permissionIntegrationRouter = createPermissionIntegrationRouter({
-    permissions: [todoListCreatePermission, todoListUpdatePermission, secretReadPermission],
+    permissions: [todoListCreatePermission, todoListUpdatePermission, todoListReadPermission],
     getResources: async resourceRefs => {
-      return resourceRefs.map(getTodo);
+      return resourceRefs.map(getSecret);
     },
     resourceType: TODO_LIST_RESOURCE_TYPE,
     rules: Object.values(rules),
@@ -79,80 +79,139 @@ export async function createRouter(
 
   router.use(permissionIntegrationRouter);
 
-  const transformConditions: ConditionTransformer<TodoFilter> = createConditionTransformer(Object.values(rules));
-  router.get('/todos', async (req, res) => {
-    const token = getBearerTokenFromAuthorizationHeader(
-      req.header('authorization'),
-    );
-  
-    const decision = (
-      await permissions.authorizeConditional([{ permission: secretReadPermission }], {
-        token,
-      })
-    )[0];
-  
-    if (decision.result === AuthorizeResult.DENY) {
-      throw new NotAllowedError('Unauthorized');
-    }
-  
-    if (decision.result === AuthorizeResult.CONDITIONAL) {
-      const filter = transformConditions(decision.conditions);
-      res.json(getAll(filter));
-    } else {
-      res.json(getAll());
-    }
-  });
-
-  // router.post('/todos', async (req, res) => {
-  //   let author: string | undefined = undefined;
-
-  //   const user = await identity.getIdentity({ request: req });
-  //   author = user?.identity.userEntityRef;
-
+  // const transformConditions: ConditionTransformer<TodoFilter> = createConditionTransformer(Object.values(authorRules));
+  // router.get('/todos', async (req, res) => {
   //   const token = getBearerTokenFromAuthorizationHeader(
   //     req.header('authorization'),
   //   );
+  
   //   const decision = (
-  //     await permissions.authorize([{ permission: todoListCreatePermission }], {
-  //     token,
+  //     await permissions.authorizeConditional([{ permission: todoListReadPermission }], {
+  //       token,
   //     })
   //   )[0];
-
+  
   //   if (decision.result === AuthorizeResult.DENY) {
   //     throw new NotAllowedError('Unauthorized');
   //   }
-
-  //   if (!isTodoCreateRequest(req.body)) {
-  //     throw new InputError('Invalid payload');
+  //   if (decision.result === AuthorizeResult.CONDITIONAL) {
+  //     const filter = transformConditions(decision.conditions);
+  //     res.json(getAll(filter));
+  //   } else {
+  //     res.json(getAll());
   //   }
-
-  //   const todo = add({ title: req.body.keyName, author });
-  //   res.json(todo);
   // });
 
-  // router.put('/todos', async (req, res) => {
-  //   const token = getBearerTokenFromAuthorizationHeader(
-  //     req.header('authorization'),
-  //   );
+  // const secretTransformConditions: ConditionTransformer<SecretFilter> = createConditionTransformer(Object.values(rules));
+  router.get('/secret',async (req, res) => {
+    const user = await identity.getIdentity({ request: req });
+    const ownership = user?.identity.ownershipEntityRefs[0]
+    const author = user?.identity.userEntityRef ?? 'unrecognized-user';
+    // if
+    console.log(`author is ${author}`)
 
-  //   if (!isTodoUpdateRequest(req.body)) {
-  //     throw new InputError('Invalid payload');
-  //   }
-
-  //   const decision = (
-  //     await permissions.authorize(
-  //       [{ permission: todoListUpdatePermission, resourceRef: req.body.id }],
-  //       {
-  //         token,
-  //       },
-  //     )
-  //   )[0];
+    // const token = getBearerTokenFromAuthorizationHeader(
+    //   req.header('authorization'),
+    // );
   
-  //   if (decision.result !== AuthorizeResult.ALLOW) {
-  //     throw new NotAllowedError('Unauthorized');
-  //   }
-  //   res.json(update(req.body));
-  // });
+    // const decision = (
+    //   await permissions.authorizeConditional([{ permission: todoListReadPermission }], {
+    //     token,
+    //   })
+    // )[0];
+  
+    // if (decision.result === AuthorizeResult.DENY) {
+    //   throw new NotAllowedError('Unauthorized');
+    // }
+    // if (decision.result === AuthorizeResult.CONDITIONAL) {
+    //   const filter = secretTransformConditions(decision.conditions);
+    //   // res.json(await getSecretsForAdmin());
+
+
+    //   // Check ownership for authorized page.
+    //   if(ownership?.includes('admin')){
+    //     res.json(await getSecretsForAdmin(author));
+    //   } else if(ownership?.includes('developer')){
+    //     res.json(await getSecretsForDev(author, filter ));
+    //   } else {
+    //     res.json(await getSecretsForViewer(filter));
+    //   }
+      
+    // } 
+    if(ownership?.includes('admin')){
+      res.json(await getSecretsForAdmin(author));
+    } else if(ownership?.includes('developer')){
+      res.json(await getSecretsForDev(author ));
+    } else {
+      res.json(await getSecretsForViewer());
+    }
+
+  })
+
+  router.post('/todos', async (req, res) => {
+    let author: string | undefined = undefined;
+
+    const user = await identity.getIdentity({ request: req });
+    author = user?.identity.userEntityRef;
+
+    // console.log(`Resquest body is ${JSON.stringify(req.body)}`)
+    
+    // const token = getBearerTokenFromAuthorizationHeader(
+    //   req.header('authorization'),
+    // );
+    // const decision = (
+    //   await permissions.authorize([{ permission: todoListCreatePermission }], {
+    //   token,
+    //   })
+    // )[0];
+
+    // if (decision.result === AuthorizeResult.DENY) {
+    //   throw new NotAllowedError('Unauthorized');
+    // }
+    // console.log(`Request body is ${JSON.stringify(req.body)}`)
+    if (!req.body.secretName) {
+      throw new InputError('Invalid Secret Name');
+    }
+
+    await createSecret(req.body, author);
+    // const todo = add({ title: req.body.title, author });
+    res.json(req.body);
+  });
+
+  router.put('/todos', async (req, res) => {
+    // const token = getBearerTokenFromAuthorizationHeader(
+    //   req.header('authorization'),
+    // );
+    const user = await identity.getIdentity({ request: req });
+    const ownership = user?.identity.ownershipEntityRefs[0]
+    // const author = user?.identity.userEntityRef ?? 'unrecognized-user';
+
+    if (!req.body.secretName) {
+      throw new InputError('Invalid Secret Name');
+    }
+
+    if(ownership?.includes('admin')){
+      res.json(await updateSecret(req.body));
+    } else {
+      throw new InputError('Do not have permission');
+    }
+
+    // const decision = (
+    //   await permissions.authorize(
+    //     [{ permission: todoListUpdatePermission, resourceRef: req.body.id }],
+    //     {
+    //       token,
+    //     },
+    //   )
+    // )[0];
+  
+    // if (decision.result !== AuthorizeResult.ALLOW) {
+    //   throw new NotAllowedError('Unauthorized');
+    // }
+    // res.json(await updateSecret(req.body));
+    // console.log(`Request body is ${JSON.stringify(req.body)}`)
+    // await updateSecret(req.body)
+  });
 
   router.use(errorHandler());
   return router;
@@ -164,6 +223,6 @@ export async function createRouter(
 
 // function isTodoUpdateRequest(
 //   request: any,
-// ): request is { title: string; id: string } {
-//   return typeof request?.id === 'string' && isTodoCreateRequest(request);
+// ): request is { secretId: string } {
+//   return typeof request.secretId === 'string' && request?.secretId;
 // }

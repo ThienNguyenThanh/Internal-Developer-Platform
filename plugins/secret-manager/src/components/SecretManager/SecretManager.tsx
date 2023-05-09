@@ -17,89 +17,116 @@ import React from 'react';
 import { Table, TableColumn, Progress } from '@backstage/core-components';
 import Alert from '@material-ui/lab/Alert';
 import useAsync from 'react-use/lib/useAsync';
-// import {
-//   discoveryApiRef,
-//   fetchApiRef,
-//   useApi,
-// } from '@backstage/core-plugin-api';
+import {
+  discoveryApiRef,
+  fetchApiRef,
+  useApi,
+} from '@backstage/core-plugin-api';
 import { Button } from '@material-ui/core';
-// import {
-//   SecretsManagerClient,
-//   GetSecretValueCommand,
-//   ListSecretsCommand
-// } from "@aws-sdk/client-secrets-manager";
-import 'aws-sdk';
-import * as dotenv from 'dotenv'
+// import { Tag } from "@aws-sdk/client-secrets-manager";
+// import { RequirePermission } from '@backstage/plugin-permission-react';
+// import { todoListUpdatePermission } from '@internal/plugin-secret-manager-common';
 
-dotenv.config();
-
+export type Todo = {
+  title: string;
+  id: string;
+  author?: string;
+  timestamp: number;
+};
 export type SecretInfo = {
   id: string;
-  keyName: string;
-  ARN: string;
-  lastChangedDate: number;
-  owner: string;
+  secretName: string;
+  ARN?: string;
+  lastChangedDate?: number;
+  description?: string;
+  secretString?: string;
+  owner?: string,
+  viewer?: string,
 };
 
+export type SecretForm = {
+  secretName: string; // required
+  description?: string;
+  secretString?: string;
+  tags?: [ // TagListType
+    { // Tag
+      key: string;
+      value: string;
+    }
+  ]
+};
+
+type TodosTableProps = {
+  todos: Todo[];
+  onEdit(todo: Todo): any;
+};
 type SecretInfoTableProps = {
   secretInfos: SecretInfo[];
   onEdit(secretInfo: SecretInfo): any;
 };
 
+export const TodoList = ({ onEdit }: { onEdit(todo: Todo): any }) => {
+  const discoveryApi = useApi(discoveryApiRef);
+  const { fetch } = useApi(fetchApiRef);
+
+  const { value, loading, error } = useAsync(async (): Promise<Todo[]> => {
+    const response = await fetch(
+      `${await discoveryApi.getBaseUrl('todolist')}/todos`,
+    );
+    return response.json();
+  }, []);
+
+  if (loading) {
+    return <Progress />;
+  } else if (error) {
+    return <Alert severity="error">{error.message}</Alert>;
+  }
+
+  return <TodosTable todos={value || []} onEdit={onEdit} />;
+};
+
+export function TodosTable({ todos, onEdit }: TodosTableProps) {
+  const columns: TableColumn<Todo>[] = [
+    { title: 'Title', field: 'title' },
+    { title: 'Author', field: 'author' },
+    {
+      title: 'Last edit',
+      field: 'timestamp',
+      render: e => new Date(e.timestamp).toLocaleString(),
+    },
+    {
+      title: 'Action',
+      render: todo => {
+        return (
+            <Button variant="contained" onClick={() => onEdit(todo)}>
+              Edit
+            </Button>
+        );
+      },
+    },
+  ];
+
+  return (
+    <Table
+      title="Todos"
+      options={{ search: false, paging: false }}
+      columns={columns}
+      data={todos}
+    />
+  );
+}
+
+
 export const SecretList = ({ onEdit }: { onEdit(todo: SecretInfo): any }) => {
-  let AWS = require('aws-sdk'),
-    region = "us-east-1";
-
-  AWS.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-  })
-
-  // Create a Secrets Manager client
-  let client = new AWS.SecretsManager({
-    region: region
-  });
-
-  let params = {
-      Filters: [ 
-        { 
-            "Key": "tag-key",
-            "Values": [ "admin" ]
-        }
-      ],
-      MaxResults: 10,
-  }
   
-
-  function getListOfSecret( response:SecretInfo[] ){
-    return new Promise( (resolve, reject) => {
-      client.listSecrets(params, function(err:any, res:any) {
-        if (err) {
-          reject(err);
-        }
-        else {
-          console.log("set up request")
-          var awsKey;
-          var data = res.SecretList;
-          for(awsKey in data) {
-              response.push({
-                "id":  data[awsKey].Name,
-                "ARN": data[awsKey].ARN,
-                "keyName": data[awsKey].Name,
-                "lastChangedDate": data[awsKey].LastChangedDate,
-                "owner": "user:admin/thiennguyenthanh",
-              })
-          }
-          resolve(response)
-        }});
-    })
-  }
+  const discoveryApi = useApi(discoveryApiRef);
+  const { fetch } = useApi(fetchApiRef);
 
   const { value, loading, error } = useAsync(async (): Promise<SecretInfo[]> => {
-    let response:SecretInfo[] =[];
-    await getListOfSecret(response);
-
-    return response;
+    const response = await fetch(
+      `${await discoveryApi.getBaseUrl('todolist')}/secret`,
+    );
+    return response.json();
   }, []);
 
   if (loading) {
@@ -113,22 +140,20 @@ export const SecretList = ({ onEdit }: { onEdit(todo: SecretInfo): any }) => {
 
 export function SecretInfoTable({ secretInfos, onEdit }: SecretInfoTableProps) {
   const columns: TableColumn<SecretInfo>[] = [
-    { title: 'Key-Name', field: 'keyName' },
+    { title: 'Key-Name', field: 'secretName' },
     { title: 'ARN', field: 'ARN' },
-    {
-      title: 'Last edit',
-      field: 'lastChangedDate',
-      render: e => new Date(e.lastChangedDate).toLocaleString(),
-    },
-    { title: 'Owner', field: 'owner' },
-    { title: 'Viewer', field:'some viewers' },
+    { title: 'Last edit', field: 'lastChangedDate'},
+    { title: 'Owner', field: 'owner'},
+    { title: 'Viewer',field: 'viewer'},
     {
       title: 'Action',
-      render: todo => {
+      render: secretInfo => {
         return (
-          <Button variant="contained" onClick={() => onEdit(todo)}>
+    
+            <Button variant="contained" onClick={() => onEdit(secretInfo)}>
             Edit
-          </Button>
+            </Button>
+          
         );
       },
     },
@@ -136,8 +161,8 @@ export function SecretInfoTable({ secretInfos, onEdit }: SecretInfoTableProps) {
 
   return (
     <Table
-      title="Todos"
-      options={{ search: false, paging: false }}
+      title="Secret Manager"
+      options={{ search: false, paging: true }}
       columns={columns}
       data={secretInfos}
     />

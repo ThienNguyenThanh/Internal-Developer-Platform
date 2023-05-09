@@ -15,7 +15,6 @@
  */
 import React, { useReducer, useRef, useState } from 'react';
 import {
-  Typography,
   Grid,
   TextField,
   Button,
@@ -24,7 +23,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Input
 } from '@material-ui/core';
 import {
   Header,
@@ -140,7 +138,6 @@ export const TodoListPage = () => {
       )}
       {!!createElement && (
         <CreateModal
-          newSecret={createElement}
           onSubmit={handleAdd}
           onCancel={() => setCreate(undefined)}
         />
@@ -180,11 +177,9 @@ function AddTodo({ onAdd }: { onAdd(todo: SecretForm): any }) {
 }
 
 function CreateModal({
-  newSecret,
   onCancel,
   onSubmit,
 }: {
-  newSecret?: SecretForm;
   onSubmit(t: SecretForm): any;
   onCancel(): any;
 }) {
@@ -292,7 +287,7 @@ function EditModal({
   onSubmit(t: SecretInfo): any;
   onCancel(): any;
 }) {
-  const title = useRef('');
+  // const title = useRef('');
   const description = useRef('');
   const secretKey = useRef('');
   const secretValue = useRef('');

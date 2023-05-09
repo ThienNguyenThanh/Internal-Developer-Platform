@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { v4 as uuid } from 'uuid';
-import { NotFoundError } from '@backstage/errors';
+// import { NotFoundError } from '@backstage/errors';
 import { SecretsManagerClient, ListSecretsCommand, CreateSecretCommand, UpdateSecretCommand, Tag } from "@aws-sdk/client-secrets-manager";
 // import {dotev} from 'dotenv';
 
@@ -139,7 +139,6 @@ export async function createSecret(newScret: SecretForm, owner?: string) {
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY ?? 'foo',
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'foo'
-       
         
       }});
 
@@ -178,8 +177,6 @@ export async function updateSecret(updateScret: SecretInfo) {
     credentials: {
       accessKeyId: process.env.AWS_ACCESS_KEY ?? 'foo',
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'foo'
-      
-      
     }});
 
   const command = new UpdateSecretCommand({
@@ -222,7 +219,6 @@ export async function getSecretsForAdmin(viewer:string) {
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY ?? 'foo',
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'foo',
-       
       }});
     const command = new ListSecretsCommand({
       Filters: [ 
@@ -242,13 +238,13 @@ export async function getSecretsForAdmin(viewer:string) {
       // console.log(results.SecretList);
       if(results.SecretList){
         let data = results.SecretList;
-        let tagViewerValue : string = '',
-            tagOwnerValue : string = '';
+        
 
         // let newScret = {} as SecretInfo;
         for(let i=0; i< data?.length; i++) {
-            
-
+            if(data){
+              let tagViewerValue : string = '',
+              tagOwnerValue : string = '';
             data[i].Tags?.map((tag) => {
               if(tag.Key == 'owner' && !tagOwnerValue){
                 tagOwnerValue = tag.Value ?? '';
@@ -267,6 +263,7 @@ export async function getSecretsForAdmin(viewer:string) {
               "owner": tagOwnerValue,
               "viewer": tagViewerValue,         
             })
+          }
           
         }
     }
@@ -277,8 +274,7 @@ export async function getSecretsForAdmin(viewer:string) {
   return response;
 }
 
-export async function getSecretsForDev(viewer:string, filter?: SecretFilters ) {
-  
+export async function getSecretsForDev(viewer:string){
   let response:SecretInfo[] = [];
    
     const client = new SecretsManagerClient({ 
@@ -286,7 +282,6 @@ export async function getSecretsForDev(viewer:string, filter?: SecretFilters ) {
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY ?? 'foo',
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'foo',
-        
       }});
     const command = new ListSecretsCommand({
       Filters: [ 
@@ -304,12 +299,15 @@ export async function getSecretsForDev(viewer:string, filter?: SecretFilters ) {
     try {
       const results = await client.send(command);
       // let newScret = {} as SecretInfo;
-      let data = results.SecretList;
-      let tagViewerValue : string = '',
-          tagOwnerValue : string = '';
-            
-      for(let i=0; i< 4; i++) {
+      if(results.SecretList){
+        let data = results.SecretList;
+        
+
+        // let newScret = {} as SecretInfo;
+        for(let i=0; i< data?.length; i++) {
         if(data){
+          let tagViewerValue : string = '',
+          tagOwnerValue : string = '';
           
           data[i].Tags?.map((tag) => {
             if(tag.Key == 'owner' && !tagOwnerValue){
@@ -330,6 +328,7 @@ export async function getSecretsForDev(viewer:string, filter?: SecretFilters ) {
             "viewer": tagViewerValue,    
           })
         }
+        }
       }
     } catch (err) {
       console.error(err);
@@ -343,7 +342,7 @@ export async function getSecretsForDev(viewer:string, filter?: SecretFilters ) {
   //   .sort((a, b) => b.lastChangedDate - a.lastChangedDate);
 }
 
-export async function getSecretsForViewer(filter?: SecretFilters) {
+export async function getSecretsForViewer() {
   
   let response:SecretInfo[] = [];
    
@@ -367,15 +366,16 @@ export async function getSecretsForViewer(filter?: SecretFilters) {
       const results = await client.send(command);
       // console.log(results.SecretList);
       let data = results.SecretList;
-      let tagViewerValue : string = '',
-          tagOwnerValue : string = '';
+      
 
         
       for(let i=0; i< 3; i++) {
-        if(data){
+
           
           if(data){
-          
+            let tagViewerValue : string = '',
+            tagOwnerValue : string = '';
+
             data[i].Tags?.map((tag) => {
               if(tag.Key == 'owner' && !tagOwnerValue){
                 tagOwnerValue = tag.Value ?? '';
@@ -394,7 +394,7 @@ export async function getSecretsForViewer(filter?: SecretFilters) {
             "owner": tagOwnerValue,
             "viewer": tagViewerValue,
           })
-        }
+        
       }
       }
     } catch (err) {
