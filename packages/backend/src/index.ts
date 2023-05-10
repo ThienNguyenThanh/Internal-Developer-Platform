@@ -37,6 +37,7 @@ import todo from './plugins/todo';
 import todoList from './plugins/todolist';
 import permission from './plugins/permission';
 import secretManager from './plugins/secretManager';
+import announcements from './plugins/announcements';
 
 function makeCreateEnv(config: Config) {
   const root = getRootLogger();
@@ -82,6 +83,7 @@ async function main() {
   });
   const createEnv = makeCreateEnv(config);
 
+  const announcementsEnv = useHotMemoize(module, () => createEnv('announcements'));
   const catalogEnv = useHotMemoize(module, () => createEnv('catalog'));
   const authEnv = useHotMemoize(module, () => createEnv('auth'));
   const proxyEnv = useHotMemoize(module, () => createEnv('proxy'));
@@ -96,6 +98,7 @@ async function main() {
   const secretManagerEnv = useHotMemoize(module, () => createEnv('secretManager'));
 
   const apiRouter = Router();
+  apiRouter.use('/announcements', await announcements(announcementsEnv));
   apiRouter.use('/catalog', await catalog(catalogEnv));
   apiRouter.use('/auth', await auth(authEnv));
   apiRouter.use('/search', await search(searchEnv));

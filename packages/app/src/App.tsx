@@ -52,6 +52,7 @@ import { HomePage } from './components/home/HomePage';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
 import { TodoListPage } from '@internal/plugin-todo-list';
+import { AnnouncementsPage } from '@internal/backstage-plugin-announcements';
 
 const app = createApp({
   apis,
@@ -128,6 +129,7 @@ const routes = (
       <HomePage />
     </Route>
     <Route path="/api-docs" element={<ApiExplorerPage />} />
+    <Route path="/announcements" element={<AnnouncementsPage />} />
     <Route path="/catalog" element={<CatalogIndexPage />} />
     <Route
       path="/catalog/:namespace/:kind/:name"

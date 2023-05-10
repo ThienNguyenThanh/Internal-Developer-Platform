@@ -36,6 +36,7 @@
     "@backstage/plugin-user-settings": "^0.7.2",
     "@backstage/test-utils": "^1.3.0",
     "@backstage/theme": "^0.2.19",
+    "@internal/backstage-plugin-announcements": "workspace:^",
     "@internal/plugin-secret-manager": "workspace:^",
     "@internal/plugin-todo-list": "workspace:^",
     "@material-ui/core": "^4.11.0",
