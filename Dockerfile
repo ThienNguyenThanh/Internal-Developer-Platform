@@ -83,14 +83,14 @@ COPY --from=build --chown=node:node /app/packages/backend/dist/bundle/ ./
 
 COPY --chown=node:node app-config.yaml app-config.production.yaml ./
 
-ENV PORT 7007
-ENV NODE_ENV production
+# ENV PORT 7007
+# ENV NODE_ENV production
 
-# For now we need to manually add these configs through environment variables but in the
-# future, we should be able to fetch the frontend config from the backend somehow
-ENV APP_CONFIG_app_baseUrl "http://localhost:7007"
-ENV APP_CONFIG_backend_baseUrl "http://localhost:7007"
-ENV APP_CONFIG_auth_environment "production"
-ENV NODE_OPTIONS "--max-old-space-size=400"
+# # For now we need to manually add these configs through environment variables but in the
+# # future, we should be able to fetch the frontend config from the backend somehow
+# ENV APP_CONFIG_app_baseUrl "http://localhost:7007"
+# ENV APP_CONFIG_backend_baseUrl "http://localhost:7007"
+# ENV APP_CONFIG_auth_environment "production"
+# ENV NODE_OPTIONS "--max-old-space-size=400"
 
 CMD ["node", "packages/backend", "--config", "app-config.yaml", "--config", "app-config.production.yaml"]
