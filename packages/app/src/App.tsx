@@ -25,6 +25,7 @@ import { UserSettingsPage } from '@backstage/plugin-user-settings';
 import { apis } from './apis';
 import { entityPage } from './components/catalog/EntityPage';
 import { searchPage } from './components/search/SearchPage';
+import { LogsPage } from './components/logs/LogsPage';
 import { Root } from './components/Root';
 
 import { AlertDisplay, OAuthRequestDialog } from '@backstage/core-components';
@@ -108,6 +109,7 @@ const routes = (
     </Route>
     <Route path="/settings" element={<UserSettingsPage />} />
     <Route path="/catalog-graph" element={<CatalogGraphPage />} />
+    <Route path="/logs" element={<LogsPage />} />
   </FlatRoutes>
 );
 
