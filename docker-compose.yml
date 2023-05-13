@@ -6,34 +6,37 @@ services:
   backstage:
     env_file:
       - .env
-    image: thien0611/backstage:dev-thien-700f5d8
+    build: 
+      context: .
+      
+    restart: always
     depends_on:
       # Our app does not work without our database
       # so this ensures our database is loaded first
-      - postgres-server
+      - postgres
     environment:
       # This value must match the name of the postgres configuration block.
-      PORT: ${PORT}
-      NODE_ENV: ${NODE_ENV}
       AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       BACKEND_SECRET: ${BACKEND_SECRET}
       BACKSTAGE_GITHUB_CLIENT_ID: ${BACKSTAGE_GITHUB_CLIENT_ID}
       BACKSTAGE_GITHUB_CLIENT_SECRET: ${BACKSTAGE_GITHUB_CLIENT_SECRET}
       BACKSTAGE_GITHUB_TOKEN: ${BACKSTAGE_GITHUB_TOKEN}
-      APP_CONFIG_app_baseUrl: ${APP_CONFIG_app_baseUrl}
-      APP_CONFIG_backend_baseUrl: ${APP_CONFIG_backend_baseUrl}
-      APP_CONFIG_auth_environment: ${APP_CONFIG_auth_environment}
-      NODE_OPTIONS: ${NODE_OPTIONS}
+      # POSTGRES_USER: postgres
+      # POSTGRES_PASSWORD: sosecret!
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432
+
     ports:
-      - "${PORT}:${PORT}"
-    volumes:
+      - "${BACKSTAGE_PORT}:${BACKSTAGE_PORT}"
+    # volumes:
       # Maps our current project directory `.` to
       # our working directory in the container
-      # - ./:/packages/src/app/
+      # - ./packages:/app
       # node_modules workaround for volumes
       # https://stackoverflow.com/a/32785014
-      - nodemodules:/src/node_modules
+      # - /app/node_modules
+      # - /app/packages/app/node_modules
+      # - /app/packages/backend/node_modules
       # - /usr/src/app/node_modules
 
 
@@ -41,9 +44,11 @@ services:
   # Note the `postgres` name is important, in out Node app when we refer
   # to  `host: "postgres"` that value is mapped on the network to the 
   # address of this container.
-  postgres-server:
+  postgres:
     image: postgres:15-alpine
-    restart: always
+    # networks:
+    #   - backstage_network
+    # restart: always
     environment:
       # You can set the value of environment variables
       # in your docker-compose.yml file
@@ -53,9 +58,14 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       # Standard port for PostgreSQL databases
-      - "5432:5432"
-    # volumes:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    volumes:
       # When the PostgresSQL container is started it will run any scripts
       # provided in the `docker-entrypoint-initdb.d` directory, this connects
       # our seed file to that directory so that it gets run
-      # - ./database-seed.sql:/docker-entrypoint-initdb.d/database-seed.sql
+      - ./database-seed.sql:/docker-entrypoint-initdb.d/database-seed.sql
+
+
+# volumes:
+#     nodemodules: {}
+

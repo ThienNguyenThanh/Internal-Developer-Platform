@@ -24,39 +24,33 @@ permission:
 backend:
   auth:
     keys:
-      # - secret: ${BACKEND_SECRET}
+      - secret: ${BACKEND_SECRET}
   baseUrl: http://localhost:7007
   listen:
     port: 7007
   csp:
     connect-src: ["'self'", 'http:', 'https:']
-    img-src: ["'self'", 'data:', 'https://backstage.io']
+    img-src: ["'self'", 'data:', 'https://avatars.githubusercontent.com']
   cors:
     origin: http://localhost:3000
     methods: [GET, POST, PUT, DELETE]
     credentials: true
   database:
-    # client: better-sqlite3
-    # connection: ':memory:'
     client: pg
-    connection:
-      host: 127.0.0.1 
-      port: 5432
-      user: 'postgres'
-      password: 'mysecretpassword'
+    connection: ${DATABASE_URL}
 
 integrations:
   github:
     - host: github.com
-      # token: ${BACKSTAGE_GITHUB_TOKEN}
+      token: ${BACKSTAGE_GITHUB_TOKEN}
 
 auth:
   environment: development
   providers:
     github:
       development:
-        # clientId: ${BACKSTAGE_GITHUB_CLIENT_ID}
-        # clientSecret: ${BACKSTAGE_GITHUB_CLIENT_SECRET}
+        clientId: ${BACKSTAGE_GITHUB_CLIENT_ID}
+        clientSecret: ${BACKSTAGE_GITHUB_CLIENT_SECRET}
 
 catalog:
   # import:

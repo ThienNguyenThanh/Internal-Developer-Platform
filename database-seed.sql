@@ -1,0 +1,1 @@
+-- CREATE DATABASE backstage_plugin_announcements;
