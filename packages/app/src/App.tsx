@@ -53,6 +53,7 @@ import { ApproveProcess } from './components/home/ApproveProcess';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
 import { AnnouncementsPage } from '@internal/backstage-plugin-announcements';
+import { EventLogsPage } from './components/eventLogs/EventLogsPage';
 
 const app = createApp({
   apis,
@@ -164,6 +165,7 @@ const routes = (
       element={<TechDocsReaderPage />}
     />
     <Route path="/explore" element={<ExplorePage />} />
+    <Route path="/event-logs" element={<EventLogsPage />} />
     <Route path="/graphiql" element={<GraphiQLPage />} />
     <Route path="/search" element={<SearchPage />}>
       {searchPage}

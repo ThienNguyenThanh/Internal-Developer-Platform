@@ -28,9 +28,11 @@ import {
 } from '@backstage/core-components';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
+import NotificationsIcon from '@material-ui/icons/Notifications';
 import { appThemeApiRef, useApi } from '@backstage/core-plugin-api';
 import { ApertureLogoFull } from './ApertureLogoFull';
 import { ApertureLogoIcon } from './ApertureLogoIcon';
+import HistoryIcon from '@material-ui/icons/History';
 import { BackstageTheme } from '@backstage/theme';
 import CategoryIcon from '@material-ui/icons/Category';
 import BugReport from '@material-ui/icons/BugReport';
@@ -95,6 +97,7 @@ export const Root = ({ children }: PropsWithChildren<{}>) => (
         <SidebarItem icon={CategoryIcon} to="secret-manager" text="Secret Manager" />
         {cardList.length ==0 && <SidebarItem icon={BugReport} to="approve-process" text="Approve process"/>}
         {cardList.length > 0 && <SidebarItem icon={EmojiNature} to="approve-process" text="Approve process"/>}
+        <SidebarItem icon={HistoryIcon} to="event-logs" text="Event logs" />
         
       </SidebarGroup>
       <SidebarDivider />
@@ -109,6 +112,7 @@ export const Root = ({ children }: PropsWithChildren<{}>) => (
         icon={<UserSettingsSignInAvatar />}
         to="/settings"
       >
+        <SidebarItem icon={NotificationsIcon} to="announcements" text="Announcements" />
         <SidebarSettings />
       </SidebarGroup>
     </Sidebar>
