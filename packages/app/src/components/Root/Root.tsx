@@ -33,6 +33,10 @@ import { ApertureLogoFull } from './ApertureLogoFull';
 import { ApertureLogoIcon } from './ApertureLogoIcon';
 import { BackstageTheme } from '@backstage/theme';
 import CategoryIcon from '@material-ui/icons/Category';
+import BugReport from '@material-ui/icons/BugReport';
+import EmojiNature from '@material-ui/icons/EmojiNature';
+import { cardList } from '../home/ApproveProcess';
+import '../home/App.css'
 
 const useSidebarLogoStyles = makeStyles<BackstageTheme, { themeId: string }>({
   root: {
@@ -89,10 +93,14 @@ export const Root = ({ children }: PropsWithChildren<{}>) => (
         <SidebarItem icon={LayersIcon} to="explore" text="Explore" />
         <SidebarItem icon={CreateComponentIcon} to="create" text="Create..." />
         <SidebarItem icon={CategoryIcon} to="secret-manager" text="Secret Manager" />
+        {cardList.length ==0 && <SidebarItem icon={BugReport} to="approve-process" text="Approve process"/>}
+        {cardList.length > 0 && <SidebarItem icon={EmojiNature} to="approve-process" text="Approve process"/>}
+        
       </SidebarGroup>
       <SidebarDivider />
       <SidebarItem icon={MapIcon} to="tech-radar" text="Tech Radar" />
       <SidebarItem icon={MoneyIcon} to="cost-insights" text="Cost Insights" />
+      
       <SidebarItem icon={GraphiQLIcon} to="graphiql" text="GraphiQL" />
       <SidebarSpace />
       <SidebarDivider />

@@ -49,6 +49,7 @@ import { SignInPage } from '@backstage/core-components';
 import { githubAuthApiRef } from '@backstage/core-plugin-api';
 import { HomepageCompositionRoot } from '@backstage/plugin-home';
 import { HomePage } from './components/home/HomePage';
+import { ApproveProcess } from './components/home/ApproveProcess';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
 import { TodoListPage } from '@internal/plugin-todo-list';
@@ -127,6 +128,9 @@ const routes = (
   <FlatRoutes>
     <Route path="/" element={<HomepageCompositionRoot />}>
       <HomePage />
+    </Route>
+    <Route path="/approve-process"  element={<HomepageCompositionRoot />}>
+      <ApproveProcess />
     </Route>
     <Route path="/api-docs" element={<ApiExplorerPage />} />
     <Route path="/announcements" element={<AnnouncementsPage />} />
