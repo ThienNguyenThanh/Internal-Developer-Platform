@@ -1,5 +1,5 @@
 import { DefaultIdentityClient } from '@backstage/plugin-auth-node';
-import { createRouter } from '@internal/plugin-todo-list-backend';
+import { createRouter } from '@internal/plugin-secret-manager-backend';
 import { Router } from 'express';
 import { PluginEnvironment } from '../types';
 

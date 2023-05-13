@@ -33,13 +33,13 @@ import { darkTheme, lightTheme } from '@backstage/theme';
 import { ScaffolderPage, scaffolderPlugin } from '@backstage/plugin-scaffolder';
 import { ApiExplorerPage } from '@backstage/plugin-api-docs';
 import { GraphiQLPage } from '@backstage/plugin-graphiql';
-import React from 'react';
 import { Root } from './components/Root';
 import { SearchPage } from '@backstage/plugin-search';
 import { TechRadarPage } from '@backstage/plugin-tech-radar';
 import { UserSettingsPage } from '@backstage/plugin-user-settings';
 import { apertureTheme } from './theme/aperture';
 import { apis } from './apis';
+import React from 'react';
 import { createApp } from '@backstage/app-defaults';
 import { entityPage } from './components/catalog/EntityPage';
 import { orgPlugin } from '@backstage/plugin-org';
@@ -52,7 +52,6 @@ import { HomePage } from './components/home/HomePage';
 import { ApproveProcess } from './components/home/ApproveProcess';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
-import { TodoListPage } from '@internal/plugin-todo-list';
 import { AnnouncementsPage } from '@internal/backstage-plugin-announcements';
 
 const app = createApp({
@@ -170,7 +169,6 @@ const routes = (
       {searchPage}
     </Route>
     <Route path="/settings" element={<UserSettingsPage />} />
-    <Route path="/todo-list" element={<TodoListPage />} />
     <Route path="/secret-manager" element={<SecretManagerPage />} />
     <Route
       path="/tech-radar"

@@ -24,6 +24,7 @@
     "clean": "backstage-cli package clean"
   },
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.332.0",
     "@backstage/backend-common": "*",
     "@backstage/backend-plugin-api": "*",
     "@backstage/config": "*",

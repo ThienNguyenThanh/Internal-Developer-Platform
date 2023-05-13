@@ -40,7 +40,6 @@
     "@emotion/styled": "^11.11.0",
     "@internal/backstage-plugin-announcements": "workspace:^",
     "@internal/plugin-secret-manager": "workspace:^",
-    "@internal/plugin-todo-list": "workspace:^",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "4.0.0-alpha.57",

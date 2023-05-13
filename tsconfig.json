@@ -10,7 +10,6 @@
   "compilerOptions": {
     "outDir": "dist-types",
     "module": "CommonJS",
-    "rootDir": ".",
-    "jsx": "react-jsx"
+    "rootDir": "."
   }
 }

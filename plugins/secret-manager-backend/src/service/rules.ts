@@ -1,5 +1,5 @@
 import { makeCreatePermissionRule } from '@backstage/plugin-permission-node';
-import { TODO_LIST_RESOURCE_TYPE } from '@internal/plugin-todo-list-common';
+import { TODO_LIST_RESOURCE_TYPE } from '@internal/plugin-secret-manager-common';
 import { z } from 'zod';
 import { SecretFilter, SecretInfo } from './todos';
 

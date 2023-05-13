@@ -1,6 +1,7 @@
-import { Typography, Button, AppBar, Card, CardActions, CardContent, CardMedia, CssBaseline, Grid, Toolbar, Container} from '@mui/material';
+import { Typography, Button, AppBar, Card, CardActions, CardContent, CssBaseline, Grid, Toolbar, Container} from '@mui/material';
 import { Campaign } from '@mui/icons-material';
 import './App.css';
+import React from 'react'
 
 export const cardList =[1, 2, 3, 4, 5, 6]
 

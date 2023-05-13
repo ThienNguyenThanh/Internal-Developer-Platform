@@ -26,11 +26,11 @@ import { isPermission } from '@backstage/plugin-permission-common';
 import {
   todoListUpdatePermission,
   todoListReadPermission,
-} from '@internal/plugin-todo-list-common';
+} from '@internal/plugin-secret-manager-common';
 import {
   todoListConditions,
   createTodoListConditionalDecision,
-} from '@internal/plugin-todo-list-backend';
+} from '@internal/plugin-secret-manager-backend';
 
 class TestPermissionPolicy implements PermissionPolicy {
   async handle(
