@@ -1,0 +1,25 @@
+/* HEADER SECTION */
+.header-bar {
+    padding: 20px;
+    background: #366 !important; 
+}
+
+/* MAIN SECTION */
+.table-container {
+    padding: 20px;
+}
+
+.MuiTableCell-root {
+    word-break: keep-all !important;
+}
+
+.MuiTableCell-head {
+    font-weight: bold !important;
+    color: #000 !important;
+    background: #ccc !important;
+}
+
+/* .MuiTableCell-body {
+    background: #fff !important;
+    border-bottom: 1px #ccc !important;
+} */
