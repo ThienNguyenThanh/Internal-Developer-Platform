@@ -1,9 +1,10 @@
 import React from "react";
-import { AppBar, Box, Checkbox, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, Toolbar, Typography, useTheme } from "@material-ui/core";
+import { AppBar, Box, Checkbox, Grid, IconButton, InputAdornment, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Toolbar, Typography, useTheme } from "@material-ui/core";
 import FirstPageIcon from '@material-ui/icons/FirstPage';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import Search from '@material-ui/icons/Search';
 import "./eventLogs.css";
 
 // DUMMY DATA
@@ -100,9 +101,58 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 // FILTER SECTION
 function TableFilterBar() {
     return (
-        <Toolbar>
-
-        </Toolbar>
+        <Box
+            id="table-filter-bar"
+            component="form"
+            noValidate
+            autoComplete="off"
+        >
+            {/* Trying to make the search box in the last order when in mobile view but fail because the React MUI does not support Item stack order in grid components */}
+            <Toolbar>
+                <Grid container spacing={1}>
+                    <Grid item xs={6} md={3} lg={2}>
+                        <TextField
+                            id="attribute-select"
+                            select
+                            label="Lookup attributes"
+                            defaultValue="all"
+                            variant="outlined"
+                        >
+                            <MenuItem key="all" value="all">
+                                All
+                            </MenuItem>
+                            {attributes.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </Grid>
+                    <Grid item xs={6} md={6} lg={8} order={{ xs: 3, md: 2 }}>
+                        <TextField
+                            id="search-box"
+                            type="search"
+                            placeholder="Search here..."
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <Search />
+                                    </InputAdornment>
+                                ),
+                            }}
+                            variant="outlined"
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={3} lg={2} order={{ xs: 2, md: 3 }}>
+                        <TextField
+                            id="date-input"
+                            type="date"
+                            variant="outlined"
+                        />
+                    </Grid>
+                </Grid>
+            </Toolbar>
+        </Box>
     );
 }
 
@@ -139,8 +189,7 @@ export const EventLogsPage = () => {
     const [rowsPerPage, setRowsPerPage] = React.useState(30);
 
     // Avoid a layout jump when reaching the last page with empty rows.
-    const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
     const handleChangePage = (
         event: React.MouseEvent<HTMLButtonElement> | null,
@@ -169,8 +218,10 @@ export const EventLogsPage = () => {
             {/* Main setcion */}
             <main className="main-section">
                 <Paper>
-                    <TableContainer style={{ maxHeight: '100vh', overflow: 'scroll' }}>
+                    <TableFilterBar />
+                    <TableContainer style={{ maxHeight: '100vh', width: '100%', overflow: 'hidden' }}>
                         <Table stickyHeader size="small" aria-label="sticky table">
+                            {/* Table header */}
                             <TableHead>
                                 <TableRow>
                                     <TableCell><Checkbox color="primary" /></TableCell>
@@ -182,6 +233,7 @@ export const EventLogsPage = () => {
                                 </TableRow>
                             </TableHead>
 
+                            {/* Display data */}
                             <TableBody>
                                 {(rowsPerPage > 0
                                     ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -204,6 +256,7 @@ export const EventLogsPage = () => {
                                 )}
                             </TableBody>
 
+                            {/* Pagination section here */}
                             <TableFooter>
                                 <TableRow>
                                     <TablePagination

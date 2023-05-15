@@ -10,3 +10,16 @@
 .main-section {
     padding: 10px 20px !important;
 }
+
+#table-filter-bar {
+    padding: 10px 0;
+}
+
+.MuiTextField-root {
+    width: 100%;
+}
+
+.MuiInputBase-input {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
