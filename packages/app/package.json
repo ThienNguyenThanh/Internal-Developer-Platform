@@ -39,6 +39,7 @@
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@internal/backstage-plugin-announcements": "workspace:^",
+    "@internal/plugin-event-log": "^0.1.0",
     "@internal/plugin-secret-manager": "workspace:^",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",

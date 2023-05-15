@@ -55,6 +55,8 @@ import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/
 import { AnnouncementsPage } from '@internal/backstage-plugin-announcements';
 import { EventLogsPage } from './components/eventLogs/EventLogsPage';
 
+import { EventLogPage } from '@internal/plugin-event-log/src/components/EventLogPage/EventLogPage';
+
 const app = createApp({
   apis,
   components: {
@@ -178,6 +180,7 @@ const routes = (
     />
     
     <Route path="/catalog-graph" element={<CatalogGraphPage />} />
+    <Route path="/event-log" element={<EventLogPage />}/>
   </FlatRoutes>
 );
 
