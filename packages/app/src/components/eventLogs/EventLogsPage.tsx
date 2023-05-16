@@ -104,13 +104,11 @@ function TableFilterBar() {
         <Box
             id="table-filter-bar"
             component="form"
-            noValidate
-            autoComplete="off"
         >
             {/* Trying to make the search box in the last order when in mobile view but fail because the React MUI does not support Item stack order in grid components */}
             <Toolbar>
                 <Grid container spacing={1}>
-                    <Grid item xs={6} md={3} lg={2}>
+                    <Grid item xs={6} md={3} lg={2} >
                         <TextField
                             id="attribute-select"
                             select
@@ -128,7 +126,7 @@ function TableFilterBar() {
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={6} md={6} lg={8} order={{ xs: 3, md: 2 }}>
+                    <Grid item xs={6} md={6} lg={8} >
                         <TextField
                             id="search-box"
                             type="search"
@@ -143,7 +141,7 @@ function TableFilterBar() {
                             variant="outlined"
                         />
                     </Grid>
-                    <Grid item xs={12} md={3} lg={2} order={{ xs: 2, md: 3 }}>
+                    <Grid item xs={12} md={3} lg={2} >
                         <TextField
                             id="date-input"
                             type="date"
@@ -192,7 +190,7 @@ export const EventLogsPage = () => {
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
     const handleChangePage = (
-        event: React.MouseEvent<HTMLButtonElement> | null,
+        _event: React.MouseEvent<HTMLButtonElement> | null,
         newPage: number,
     ) => {
         setPage(newPage);
