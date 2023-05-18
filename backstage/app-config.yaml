@@ -46,7 +46,7 @@ integrations:
     #   token: ${GHE_TOKEN}
   gitlab:
     - host: gitlab.com
-      token: glpat-cKGCw93v33R6yhMP8MBx
+      token: ${GITLAB_ADMIN_TOKEN}
 
 proxy:
   ### Example for how to add a proxy endpoint for the frontend.
@@ -72,9 +72,9 @@ auth:
   providers:
     okta:
       development:
-        clientId: 0oa5iszc9xVr43FCn697
-        clientSecret: xag0pSKD5uaC-QmCavrwIjrXeX1Jgud19zZvVYBE
-        audience: https://trial-4061906.okta.com
+        clientId: ${AUTH_OKTA_CLIENT_ID}
+        clientSecret: ${AUTH_OKTA_CLIENT_SECRET}
+        audience: ${AUTH_OKTA_DOMAIN}
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
