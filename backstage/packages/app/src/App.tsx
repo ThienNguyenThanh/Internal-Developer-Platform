@@ -33,9 +33,30 @@ import { AppRouter, FlatRoutes } from '@backstage/core-app-api';
 import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
+import { AppCatalogPage } from '@aws/plugin-aws-apps-for-backstage';
+import {SignInPage} from '@backstage/core-components'
+import { oktaAuthApiRef } from '@backstage/core-plugin-api';
 
 const app = createApp({
   apis,
+  components: {
+    SignInPage: props => {
+      return (
+        <SignInPage
+          {...props}
+          auto
+          providers={[
+            {
+              id: 'okta-auth-provider',
+              title: 'Okta',
+              message: 'Sign in using Okta credentials',
+              apiRef: oktaAuthApiRef,
+            },
+          ]}
+        />
+      );
+    },
+  },
   bindRoutes({ bind }) {
     bind(catalogPlugin.externalRoutes, {
       createComponent: scaffolderPlugin.routes.root,
@@ -56,6 +77,9 @@ const app = createApp({
 const routes = (
   <FlatRoutes>
     <Route path="/" element={<Navigate to="catalog" />} />
+    <Route path="/aws-apps-search-page" element={<CatalogIndexPage />}>
+      <AppCatalogPage />
+    </Route>
     <Route path="/catalog" element={<CatalogIndexPage />} />
     <Route
       path="/catalog/:namespace/:kind/:name"

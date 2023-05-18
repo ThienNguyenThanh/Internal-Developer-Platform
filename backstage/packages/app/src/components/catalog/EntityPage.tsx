@@ -55,6 +55,31 @@ import {
 
 import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
+import { Entity } from '@backstage/catalog-model';
+import {
+  AwsAppPage,
+  EntityCustomGitlabContent,
+  EntityAppStateCard,
+  EntityAppStateCardCloudFormation,
+  EntityGeneralInfoCard,
+  EntityCloudwatchLogsTable,
+  EntityInfrastructureInfoCard,
+  EntityAppConfigCard,
+  EntityAuditTable,
+} from '@aws/plugin-aws-apps-for-backstage';
+import { isGitlabAvailable } from '@immobiliarelabs/backstage-plugin-gitlab';
+
+const isCicdApplicable = (entity: Entity) => {
+  return isGitlabAvailable(entity) || isGithubActionsAvailable(entity);
+};
+export const isServerlessRestApi = (entity: Entity): boolean => {
+  const subType = entity?.metadata?.annotations?.['aws.amazon.com/baws-component-subtype'];
+  return 'serverless-rest-api' === subType;
+};
+export const isLogsAvailable = (entity: Entity): boolean => {
+  return !!entity?.metadata?.annotations?.['aws.amazon.com/baws-task-log-group'] ||
+  'serverless-rest-api' === entity?.metadata?.annotations?.['aws.amazon.com/baws-component-subtype'];
+};
 
 const techdocsContent = (
   <EntityTechdocsContent>
@@ -88,6 +113,10 @@ const cicdContent = (
         }
       />
     </EntitySwitch.Case>
+
+    <EntitySwitch.Case if={isGitlabAvailable}>
+      <EntityCustomGitlabContent />
+    </EntitySwitch.Case>
   </EntitySwitch>
 );
 
@@ -110,6 +139,98 @@ const entityWarningContent = (
     </EntitySwitch>
   </>
 );
+
+const awsEcsAppViewContent = (
+  <Grid container spacing={3} alignItems="stretch">
+    {entityWarningContent}
+    <Grid item md={6}>
+      <EntityAboutCard variant="gridItem" />
+    </Grid>
+    <Grid item md={6} xs={12}>
+      <EntityCatalogGraphCard variant="gridItem" height={400} />
+    </Grid>
+    <Grid item md={6} xs={12}>
+      <EntityLinksCard />
+    </Grid>
+    <Grid item md={6} xs={12}>
+      <EntityGeneralInfoCard />
+    </Grid>
+    <Grid item md={6} xs={12}>
+      <EntityAppStateCard></EntityAppStateCard>
+    </Grid>
+    <Grid item md={6} xs={12}>
+      <EntityAppConfigCard></EntityAppConfigCard>
+    </Grid>
+    <Grid item md={12} xs={12}>
+      <EntityInfrastructureInfoCard />
+    </Grid>
+  </Grid>
+  );
+  
+const awsServerlessRestApiAppViewContent = (
+  <Grid container spacing={3} alignItems="stretch">
+    {entityWarningContent}
+    <Grid item md={6}>
+      <EntityAboutCard variant="gridItem" />
+    </Grid>
+    <Grid item md={6} xs={12}>
+      <EntityCatalogGraphCard variant="gridItem" height={400} />
+    </Grid>
+    <Grid item md={6} xs={12}>
+      <EntityLinksCard />
+    </Grid>
+    <Grid item md={6} xs={12}>
+      <EntityGeneralInfoCard />
+    </Grid>
+    <Grid item md={12} xs={12}>
+      <EntityAppStateCardCloudFormation />
+    </Grid>
+    <Grid item md={12} xs={12}>
+      <EntityInfrastructureInfoCard />
+    </Grid>
+  </Grid>
+  );
+  
+const awsAppViewContent = (
+  <EntitySwitch>
+    <EntitySwitch.Case if={isServerlessRestApi} children={awsServerlessRestApiAppViewContent} />
+    <EntitySwitch.Case>{awsEcsAppViewContent}</EntitySwitch.Case>
+  </EntitySwitch>
+  );
+  
+const awsAppLogsContent = (
+  <Grid container spacing={3} alignItems="stretch">
+    <Grid item md={12} xs={12}>
+      <EntityCloudwatchLogsTable />
+    </Grid>
+  </Grid>
+);
+
+const auditContent = (
+  <Grid container spacing={1} alignItems="stretch">
+    {entityWarningContent}
+    <Grid item md={12} xs={12}>
+      <EntityAuditTable />
+    </Grid>
+  </Grid>
+  );
+
+const awsAppEntityPage = (
+  <EntityLayout>
+    <EntityLayout.Route path="/" title="Overview">
+      {awsAppViewContent}
+    </EntityLayout.Route>
+    <EntityLayout.Route path="/ci-cd" title="CI/CD">
+      {cicdContent}
+    </EntityLayout.Route>
+    <EntityLayout.Route path="/logs" title="App Logs" if={isLogsAvailable}>
+      {awsAppLogsContent}
+    </EntityLayout.Route>
+    <EntityLayout.Route path="/audit" title="Audit">
+      {auditContent}
+    </EntityLayout.Route>
+  </EntityLayout>
+  );
 
 const overviewContent = (
   <Grid container spacing={3} alignItems="stretch">
@@ -211,6 +332,10 @@ const defaultEntityPage = (
     <EntityLayout.Route path="/docs" title="Docs">
       {techdocsContent}
     </EntityLayout.Route>
+
+    <EntityLayout.Route path="/ci-cd" title="CI/CD" if={isCicdApplicable}>
+      {cicdContent}
+    </EntityLayout.Route>
   </EntityLayout>
 );
 
@@ -225,6 +350,12 @@ const componentPage = (
     </EntitySwitch.Case>
 
     <EntitySwitch.Case>{defaultEntityPage}</EntitySwitch.Case>
+
+    <EntitySwitch.Case if={isComponentType('aws-app')}>
+      <AwsAppPage>
+        {awsAppEntityPage}
+      </AwsAppPage>
+  </EntitySwitch.Case>
   </EntitySwitch>
 );
 

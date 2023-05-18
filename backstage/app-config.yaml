@@ -44,6 +44,9 @@ integrations:
     # - host: ghe.example.net
     #   apiBaseUrl: https://ghe.example.net/api/v3
     #   token: ${GHE_TOKEN}
+  gitlab:
+    - host: gitlab.com
+      token: glpat-cKGCw93v33R6yhMP8MBx
 
 proxy:
   ### Example for how to add a proxy endpoint for the frontend.
@@ -65,7 +68,13 @@ techdocs:
 
 auth:
   # see https://backstage.io/docs/auth/ to learn about auth providers
-  providers: {}
+  environment: development
+  providers:
+    okta:
+      development:
+        clientId: 0oa5iszc9xVr43FCn697
+        clientSecret: xag0pSKD5uaC-QmCavrwIjrXeX1Jgud19zZvVYBE
+        audience: https://trial-4061906.okta.com
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
