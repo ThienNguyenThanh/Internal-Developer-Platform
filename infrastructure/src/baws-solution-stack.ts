@@ -90,36 +90,36 @@ export class BAWSStack extends cdk.Stack {
     });
 
     // Create VPC for hosting apps ENV2 - QA
-    const appsNetwork3 = new NetworkConstruct(this, "Backstage Apps QA Network1", {
-      config: props.config,
-      cidrRange: "172.16.0.0/20",
-      isIsolated: false,
-      id: "app-qa-network1",
-    });
+    // const appsNetwork3 = new NetworkConstruct(this, "Backstage Apps QA Network1", {
+    //   config: props.config,
+    //   cidrRange: "172.16.0.0/20",
+    //   isIsolated: false,
+    //   id: "app-qa-network1",
+    // });
 
     // Create VPC for hosting apps ENV2 - QA - Private
-    const appsNetwork4 = new NetworkConstruct(this, "Backstage Apps QA Network2", {
-      config: props.config,
-      cidrRange: "172.16.2.0/20",
-      isIsolated: true,
-      id: "app-qa-network2",
-    });
+    // const appsNetwork4 = new NetworkConstruct(this, "Backstage Apps QA Network2", {
+    //   config: props.config,
+    //   cidrRange: "172.16.2.0/20",
+    //   isIsolated: true,
+    //   id: "app-qa-network2",
+    // });
 
     // Create VPC for hosting apps ENV3 - Prod
-    const appsNetwork5 = new NetworkConstruct(this, "Backstage Apps Prod Network1", {
-      config: props.config,
-      cidrRange: "172.16.4.0/20",
-      isIsolated: false,
-      id: "app-prod-network1",
-    });
+    // const appsNetwork5 = new NetworkConstruct(this, "Backstage Apps Prod Network1", {
+    //   config: props.config,
+    //   cidrRange: "172.16.4.0/20",
+    //   isIsolated: false,
+    //   id: "app-prod-network1",
+    // });
 
     // Create VPC for hosting apps ENV3 - Prod - Private
-    const appsNetwork6 = new NetworkConstruct(this, "Backstage Apps Prod Network2", {
-      config: props.config,
-      cidrRange: "172.16.6.0/20",
-      isIsolated: true,
-      id: "app-prod-network2",
-    });
+    // const appsNetwork6 = new NetworkConstruct(this, "Backstage Apps Prod Network2", {
+    //   config: props.config,
+    //   cidrRange: "172.16.6.0/20",
+    //   isIsolated: true,
+    //   id: "app-prod-network2",
+    // });
 
     // Create EC2 Hosted Gitlab
     const gitlabHostingConstruct = new GitlabHostingConstruct(this, "GitlabHosting Construct", {
@@ -137,29 +137,29 @@ export class BAWSStack extends cdk.Stack {
     });
 
     // Create API Gateway Custom Domain for serverless QA APIs
-    new ApiGatewayDomainConstruct(this, `${props.config.AppPrefix}-api-gw-custom-domain-qa`, {
-      config: props.config,
-      hostedZone,
-      environment: "qa",
-    });
+    // new ApiGatewayDomainConstruct(this, `${props.config.AppPrefix}-api-gw-custom-domain-qa`, {
+    //   config: props.config,
+    //   hostedZone,
+    //   environment: "qa",
+    // });
 
     // Create API Gateway Custom Domain for serverless PROD APIs
-    new ApiGatewayDomainConstruct(this, `${props.config.AppPrefix}-api-gw-custom-domain-prod`, {
-      config: props.config,
-      hostedZone,
-      environment: "prod",
-    });
+    // new ApiGatewayDomainConstruct(this, `${props.config.AppPrefix}-api-gw-custom-domain-prod`, {
+    //   config: props.config,
+    //   hostedZone,
+    //   environment: "prod",
+    // });
 
     // Create an ECS cluster for the app networks
 
     // Create an ECS cluster for the app1 (public) environment
     // We use a fargate launch-type as an example here, but it can also be an EC2 launch-type
-    const publicDevAppCluster = new EcsClusterConstruct(this, `${props.config.AppPrefix}-public-dev-app-runtime`, {
-      vpc: appsNetwork1.vpc,
-      isFargateCluster: true,
-      config: props.config,
-      encryptionKey: key,
-    });
+    // const publicDevAppCluster = new EcsClusterConstruct(this, `${props.config.AppPrefix}-public-dev-app-runtime`, {
+    //   vpc: appsNetwork1.vpc,
+    //   isFargateCluster: true,
+    //   config: props.config,
+    //   encryptionKey: key,
+    // });
 
     // We use an EC2 launch-type as an example here, but it can also be Fargate
     const isolatedDevAppCluster = new EcsClusterConstruct(this, `${props.config.AppPrefix}-isolated-dev-app-runtime`, {
@@ -173,46 +173,46 @@ export class BAWSStack extends cdk.Stack {
       encryptionKey: key,
     });
 
-    const publicQAAppCluster = new EcsClusterConstruct(this, `${props.config.AppPrefix}-public-qa-app-runtime`, {
-      vpc: appsNetwork3.vpc,
-      isFargateCluster: true,
-      config: props.config,
-      containerInsights: true,
-      encryptionKey: key,
-    });
+    // const publicQAAppCluster = new EcsClusterConstruct(this, `${props.config.AppPrefix}-public-qa-app-runtime`, {
+    //   vpc: appsNetwork3.vpc,
+    //   isFargateCluster: true,
+    //   config: props.config,
+    //   containerInsights: true,
+    //   encryptionKey: key,
+    // });
 
-    const isolatedQAAppCluster = new EcsClusterConstruct(this, `${props.config.AppPrefix}-isolated-qa-app-runtime`, {
-      vpc: appsNetwork4.vpc,
-      isFargateCluster: false,
-      ec2MinCapacity: 0,
-      ec2MaxCapacity: 2,
-      ec2InstanceType: new ec2.InstanceType("t3.large"),
-      ec2VpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
-      config: props.config,
-      encryptionKey: key,
-    });
+    // const isolatedQAAppCluster = new EcsClusterConstruct(this, `${props.config.AppPrefix}-isolated-qa-app-runtime`, {
+    //   vpc: appsNetwork4.vpc,
+    //   isFargateCluster: false,
+    //   ec2MinCapacity: 0,
+    //   ec2MaxCapacity: 2,
+    //   ec2InstanceType: new ec2.InstanceType("t3.large"),
+    //   ec2VpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
+    //   config: props.config,
+    //   encryptionKey: key,
+    // });
 
-    const publicPRODAppCluster = new EcsClusterConstruct(this, `${props.config.AppPrefix}-public-prod-app-runtime`, {
-      vpc: appsNetwork5.vpc,
-      isFargateCluster: true,
-      config: props.config,
-      encryptionKey: key,
-    });
+    // const publicPRODAppCluster = new EcsClusterConstruct(this, `${props.config.AppPrefix}-public-prod-app-runtime`, {
+    //   vpc: appsNetwork5.vpc,
+    //   isFargateCluster: true,
+    //   config: props.config,
+    //   encryptionKey: key,
+    // });
 
-    const isolatedPRODAppCluster = new EcsClusterConstruct(
-      this,
-      `${props.config.AppPrefix}-isolated-prod-app-runtime`,
-      {
-        vpc: appsNetwork6.vpc,
-        isFargateCluster: false,
-        ec2MinCapacity: 0,
-        ec2MaxCapacity: 2,
-        ec2InstanceType: new ec2.InstanceType("t3.large"),
-        ec2VpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
-        config: props.config,
-        encryptionKey: key,
-      }
-    );
+    // const isolatedPRODAppCluster = new EcsClusterConstruct(
+    //   this,
+    //   `${props.config.AppPrefix}-isolated-prod-app-runtime`,
+    //   {
+    //     vpc: appsNetwork6.vpc,
+    //     isFargateCluster: false,
+    //     ec2MinCapacity: 0,
+    //     ec2MaxCapacity: 2,
+    //     ec2InstanceType: new ec2.InstanceType("t3.large"),
+    //     ec2VpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
+    //     config: props.config,
+    //     encryptionKey: key,
+    //   }
+    // );
 
     // Create DB for backstage platform
     const rdsConstruct = new RdsConstruct(this, "Rds-construct", {
@@ -228,7 +228,7 @@ export class BAWSStack extends cdk.Stack {
 
     const oktaSecret = secretsmanager.Secret.fromSecretNameV2(
       this,
-      `${props.config.AppPrefix}-okta-secrets`,
+      `${props.config.AppPrefix}-okta-secret`,
       props.config.OktaConfigSecret
     );
 
@@ -291,21 +291,21 @@ export class BAWSStack extends cdk.Stack {
         backstageNetwork.vpc,
         appsNetwork1.vpc,
         appsNetwork2.vpc,
-        appsNetwork3.vpc,
-        appsNetwork4.vpc,
-        appsNetwork5.vpc,
-        appsNetwork6.vpc,
+        // appsNetwork3.vpc,
+        // appsNetwork4.vpc,
+        // appsNetwork5.vpc,
+        // appsNetwork6.vpc,
       ],
       isAdmin: true,
       isRoot: false,
       ecsCollection: [
         backstageConstruct.cluster,
-        publicDevAppCluster.cluster,
+        // publicDevAppCluster.cluster,
         isolatedDevAppCluster.cluster,
-        publicQAAppCluster.cluster,
-        isolatedQAAppCluster.cluster,
-        publicPRODAppCluster.cluster,
-        isolatedPRODAppCluster.cluster,
+        // publicQAAppCluster.cluster,
+        // isolatedQAAppCluster.cluster,
+        // publicPRODAppCluster.cluster,
+        // isolatedPRODAppCluster.cluster,
       ],
       rootRole: backstageMasterRole.IAMRole,
     });
@@ -316,29 +316,30 @@ export class BAWSStack extends cdk.Stack {
       vpcCollection: [appsNetwork1.vpc, appsNetwork2.vpc],
       isAdmin: false,
       isRoot: false,
-      ecsCollection: [publicDevAppCluster.cluster, isolatedDevAppCluster.cluster],
+      ecsCollection: [ isolatedDevAppCluster.cluster],
+      // ecsCollection: [publicDevAppCluster.cluster, isolatedDevAppCluster.cluster],
       rootRole: backstageMasterRole.IAMRole,
     });
 
-    const appTestingRoleSeedData = this.createAppRole("qa", {
-      config: props.config,
-      KMSkey: key,
-      vpcCollection: [appsNetwork3.vpc, appsNetwork4.vpc],
-      isAdmin: false,
-      isRoot: false,
-      ecsCollection: [publicQAAppCluster.cluster, isolatedQAAppCluster.cluster],
-      rootRole: backstageMasterRole.IAMRole,
-    });
+    // const appTestingRoleSeedData = this.createAppRole("qa", {
+    //   config: props.config,
+    //   KMSkey: key,
+    //   vpcCollection: [appsNetwork3.vpc, appsNetwork4.vpc],
+    //   isAdmin: false,
+    //   isRoot: false,
+    //   ecsCollection: [publicQAAppCluster.cluster, isolatedQAAppCluster.cluster],
+    //   rootRole: backstageMasterRole.IAMRole,
+    // });
 
-    const appProdRoleSeedData = this.createAppRole("dev-ops", {
-      config: props.config,
-      KMSkey: key,
-      vpcCollection: [appsNetwork5.vpc, appsNetwork6.vpc],
-      isAdmin: false,
-      isRoot: false,
-      ecsCollection: [publicPRODAppCluster.cluster, isolatedPRODAppCluster.cluster],
-      rootRole: backstageMasterRole.IAMRole,
-    });
+    // const appProdRoleSeedData = this.createAppRole("dev-ops", {
+    //   config: props.config,
+    //   KMSkey: key,
+    //   vpcCollection: [appsNetwork5.vpc, appsNetwork6.vpc],
+    //   isAdmin: false,
+    //   isRoot: false,
+    //   ecsCollection: [publicPRODAppCluster.cluster, isolatedPRODAppCluster.cluster],
+    //   rootRole: backstageMasterRole.IAMRole,
+    // });
 
     // Create Solution DynamoDB Tables - SecurityRoleMapping, Audit
     const securityMappingTableConstruct = new DynamoDBConstruct(this, "security-mapping-table", {
@@ -358,9 +359,9 @@ export class BAWSStack extends cdk.Stack {
         // ? This maybe can be done in a loop
         [securityMappingTableConstruct.table.tableName]: [
           appDevRoleSeedData,
-          appProdRoleSeedData,
+          // appProdRoleSeedData,
           appAdminRoleSeedData,
-          appTestingRoleSeedData,
+          // appTestingRoleSeedData,
         ],
       },
     };

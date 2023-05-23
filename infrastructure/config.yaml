@@ -2,12 +2,12 @@ AppPrefix: "baws"
 Account: "793443493308"
 Region: "us-east-1"
 ReplicaRegion: "us-west-2"
-OktaConfigSecret: "baws-okta-secrets"
+OktaConfigSecret: "baws-okta-secret"
 DbConfigSecret: "baws-db-secrets"
 GitlabSecret: "baws-admin-gitlab-secrets"
 GitlabAmi: "ami-08bd402cb9916c2e3"
 R53HostedZoneName: "backstagedemo.dev"
 AllowedIPs:
   - 192.168.0.0/20
-  - 172.16.0.0/20
-  - 172.16.4.0/20
+  - 192.168.2.0/20
+  - 10.0.0.0/20
