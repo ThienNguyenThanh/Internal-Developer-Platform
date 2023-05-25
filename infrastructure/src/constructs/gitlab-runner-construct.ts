@@ -112,7 +112,7 @@ export class GitlabRunnerConstruct extends Construct {
     userData.addCommands(modifiedUserData);
 
     const autoScalingGroup = new autoscaling.AutoScalingGroup(this, "GitLabRunnerAutoScalingGroup", {
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MEDIUM),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.SMALL),
       vpc: props.vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
       blockDevices: [blockDevice],
