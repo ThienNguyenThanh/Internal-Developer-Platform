@@ -40,7 +40,7 @@ export class ProvisioningPipelineConstruct extends Construct {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     props = { ...defaultProps, ...props };
 
-    const gitlabSecret = secretsmanager.Secret.fromSecretNameV2(this, "gitlab-secret", props.config.GitlabSecret);
+    const gitlabSecret = secretsmanager.Secret.fromSecretNameV2(this, "gitlab-secret-infor", props.config.GitlabSecret);
 
     const artifactBucket = new s3.Bucket(this, "Artifact Bucket", {
       removalPolicy: cdk.RemovalPolicy.DESTROY,

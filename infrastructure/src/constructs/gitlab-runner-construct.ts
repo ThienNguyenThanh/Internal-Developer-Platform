@@ -49,7 +49,7 @@ export class GitlabRunnerConstruct extends Construct {
 
         new iam.PolicyStatement({
           resources: [
-            `arn:aws:secretsmanager:${props.config.Region}:${props.config.Account}:secret:baws-admin-gitlab-secrets-??????`,
+            `arn:aws:secretsmanager:${props.config.Region}:${props.config.Account}:secret:baws-admin-gitlab-secret-??????`,
           ],
           actions: [
             "secretsmanager:DescribeSecret",

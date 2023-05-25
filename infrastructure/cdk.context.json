@@ -1,8 +1,4 @@
 {
-  "hosted-zone:account=793443493308:domainName=backstagedemo.dev:region=us-east-1": {
-    "Id": "/hostedzone/Z05786121AXNPKYZ1NMBZ",
-    "Name": "backstagedemo.dev."
-  },
   "availability-zones:account=793443493308:region=us-east-1": [
     "us-east-1a",
     "us-east-1b",
@@ -10,5 +6,9 @@
     "us-east-1d",
     "us-east-1e",
     "us-east-1f"
-  ]
+  ],
+  "hosted-zone:account=793443493308:domainName=s3836455assignment2.online:region=us-east-1": {
+    "Id": "/hostedzone/Z0037916XS7Y41TY2SG9",
+    "Name": "s3836455assignment2.online."
+  }
 }
