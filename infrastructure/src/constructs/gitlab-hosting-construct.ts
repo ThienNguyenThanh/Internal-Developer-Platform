@@ -83,7 +83,7 @@ export class GitlabHostingConstruct extends Construct {
 
     const gitlabHost = new ec2.Instance(this, "GitlabHost", {
       instanceName: `${props.config.AppPrefix}-GitlabHost`,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.C5, ec2.InstanceSize.XLARGE),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MEDIUM),
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
       vpc: props.network.vpc,
       securityGroup: instanceSecurityGroup,
