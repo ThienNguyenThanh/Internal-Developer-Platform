@@ -40,6 +40,7 @@ integrations:
       # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
       # about setting up the GitHub integration here: https://backstage.io/docs/getting-started/configuration#setting-up-a-github-integration
       token: ${GITHUB_TOKEN}
+
     ### Example for how to add your GitHub Enterprise instance using the API:
     # - host: ghe.example.net
     #   apiBaseUrl: https://ghe.example.net/api/v3
@@ -75,6 +76,14 @@ auth:
         clientId: ${AUTH_OKTA_CLIENT_ID}
         clientSecret: ${AUTH_OKTA_CLIENT_SECRET}
         audience: ${AUTH_OKTA_DOMAIN}
+
+    microsoft:
+      development:
+        clientId: ${AUTH_MICROSOFT_CLIENT_ID}
+        clientSecret: ${AUTH_MICROSOFT_CLIENT_SECRET}
+        tenantId: ${AUTH_MICROSOFT_TENANT_ID}
+   
+        
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options

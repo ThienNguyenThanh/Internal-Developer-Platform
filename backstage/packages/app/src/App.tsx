@@ -35,7 +35,7 @@ import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
 import { AppCatalogPage } from '@aws/plugin-aws-apps-for-backstage';
 import {SignInPage} from '@backstage/core-components'
-import { oktaAuthApiRef } from '@backstage/core-plugin-api';
+import { microsoftAuthApiRef, oktaAuthApiRef } from '@backstage/core-plugin-api';
 
 const app = createApp({
   apis,
@@ -52,6 +52,12 @@ const app = createApp({
               message: 'Sign in using Okta credentials',
               apiRef: oktaAuthApiRef,
             },
+            {
+              id: 'azure-auth-provider',
+              title: 'Azure',
+              message: 'Sign in using Azure',
+              apiRef: microsoftAuthApiRef,
+            }
           ]}
         />
       );
