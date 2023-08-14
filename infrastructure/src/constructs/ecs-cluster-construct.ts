@@ -28,7 +28,7 @@ export interface EcsClusterConstructProps extends cdk.StackProps {
    * The EC2 instance types to use in a EC2 launch-type cluster.
    * This property should not be specified for Fargate clusters.
    *
-   * @default - use 't2.micro' instance types
+   * @default - use 'c5.large' instance types
    */
   ec2InstanceType?: vpc.InstanceType;
   containerInsights?:boolean
@@ -62,7 +62,7 @@ export interface EcsClusterConstructProps extends cdk.StackProps {
 
 const defaultProps: Partial<EcsClusterConstructProps> = {
   isFargateCluster: true,
-  ec2InstanceType: new vpc.InstanceType("t2.micro"),
+  ec2InstanceType: new vpc.InstanceType("c5.large"),
   ec2MinCapacity: 0,
   ec2MaxCapacity: 5,
   ec2VpcSubnets: { subnetType: vpc.SubnetType.PRIVATE_WITH_EGRESS },

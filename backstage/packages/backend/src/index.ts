@@ -33,6 +33,8 @@ import { ServerPermissionClient } from '@backstage/plugin-permission-node';
 import { DefaultIdentityClient } from '@backstage/plugin-auth-node';
 import gitlab from './plugins/gitlab';
 import awsApps from './plugins/awsApps';
+import secretManager from './plugins/secretManager';
+import permission from './plugins/permission';
 
 function makeCreateEnv(config: Config) {
   const root = getRootLogger();
@@ -40,7 +42,7 @@ function makeCreateEnv(config: Config) {
   const discovery = SingleHostDiscovery.fromConfig(config);
   const cacheManager = CacheManager.fromConfig(config);
   const databaseManager = DatabaseManager.fromConfig(config, { logger: root });
-  const tokenManager = ServerTokenManager.noop();
+  const tokenManager = ServerTokenManager.fromConfig(config, { logger: root });
   const taskScheduler = TaskScheduler.fromConfig(config);
 
   const identity = DefaultIdentityClient.create({
@@ -89,6 +91,8 @@ async function main() {
   const appEnv = useHotMemoize(module, () => createEnv('app'));
   const awsAppsEnv = useHotMemoize(module, () => createEnv('aws-apps-backend'));
   const gitlabEnv = useHotMemoize(module, () => createEnv('gitlab'));
+  const secretManagerEnv = useHotMemoize(module, () => createEnv('secretManager'));
+  const permissionEnv = useHotMemoize(module, () => createEnv('permission'));
 
   const apiRouter = Router();
   apiRouter.use('/catalog', await catalog(catalogEnv));
@@ -99,6 +103,8 @@ async function main() {
   apiRouter.use('/search', await search(searchEnv));
   apiRouter.use('/gitlab', await gitlab(gitlabEnv));
   apiRouter.use('/aws-apps-backend', await awsApps(awsAppsEnv));
+  apiRouter.use('/secret-manager', await secretManager(secretManagerEnv));
+  apiRouter.use('/permission', await permission(permissionEnv));
 
   // Add backends ABOVE this line; this 404 handler is the catch-all fallback
   apiRouter.use(notFoundHandler());

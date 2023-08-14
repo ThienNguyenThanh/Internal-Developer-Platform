@@ -5,6 +5,9 @@ app:
 organization:
   name: My Company
 
+permission:
+  enabled: true
+
 backend:
   # Used for enabling authentication, secret is shared by all backend plugins
   # See https://backstage.io/docs/auth/service-to-service-auth for
@@ -35,19 +38,19 @@ backend:
   # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
 
 integrations:
-  github:
-    - host: github.com
-      # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
-      # about setting up the GitHub integration here: https://backstage.io/docs/getting-started/configuration#setting-up-a-github-integration
-      token: ${GITHUB_TOKEN}
+  # github:
+  #   - host: github.com
+  # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
+  # about setting up the GitHub integration here: https://backstage.io/docs/getting-started/configuration#setting-up-a-github-integration
+  # token: ${GITHUB_TOKEN}
 
-    ### Example for how to add your GitHub Enterprise instance using the API:
-    # - host: ghe.example.net
-    #   apiBaseUrl: https://ghe.example.net/api/v3
-    #   token: ${GHE_TOKEN}
+  ### Example for how to add your GitHub Enterprise instance using the API:
+  # - host: ghe.example.net
+  #   apiBaseUrl: https://ghe.example.net/api/v3
+  #   token: ${GHE_TOKEN}
   gitlab:
     - host: gitlab.com
-      token: ${GITLAB_ADMIN_TOKEN}
+      token: glpat-c7tjWFpGRbnHxV7ui6Pd
 
 proxy:
   ### Example for how to add a proxy endpoint for the frontend.
@@ -71,19 +74,17 @@ auth:
   # see https://backstage.io/docs/auth/ to learn about auth providers
   environment: development
   providers:
-    okta:
-      development:
-        clientId: ${AUTH_OKTA_CLIENT_ID}
-        clientSecret: ${AUTH_OKTA_CLIENT_SECRET}
-        audience: ${AUTH_OKTA_DOMAIN}
+    # okta:
+    #   development:
+    #     clientId: ${AUTH_OKTA_CLIENT_ID}
+    #     clientSecret: ${AUTH_OKTA_CLIENT_SECRET}
+    #     audience: ${AUTH_OKTA_DOMAIN}
 
     microsoft:
       development:
-        clientId: ${AUTH_MICROSOFT_CLIENT_ID}
-        clientSecret: ${AUTH_MICROSOFT_CLIENT_SECRET}
-        tenantId: ${AUTH_MICROSOFT_TENANT_ID}
-   
-        
+        clientId: 1c0d3eaa-1a48-429a-a542-14ecc0da8b2a
+        clientSecret: 5iv8Q~0b~NB~_xCIo0F0DItbN~cv1eo7Wl8ZPbxs
+        tenantId: 8691d098-4215-4ec9-b708-330d570e7e35
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options

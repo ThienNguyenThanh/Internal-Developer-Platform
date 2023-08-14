@@ -20,15 +20,15 @@ export class BAWSPrereqStack extends cdk.Stack {
 
     // Create encryption key for all data at rest encryption
     const key = new kms.Key(this, `${props.config.AppPrefix}-key`, {
-      alias: `${props.config.AppPrefix}-keys`,
+      alias: `${props.config.AppPrefix}-key`,
       enableKeyRotation: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       pendingWindow: cdk.Duration.days(8),
     });
 
     // Create a secret to store Okta authentication details
-    const oktaSecret = new secretsmanager.Secret(this, `${props.config.AppPrefix}-key-okta-secret-infor`, {
-      secretName: `${props.config.AppPrefix}-okta-secret-infor`,
+    const oktaSecret = new secretsmanager.Secret(this, `${props.config.AppPrefix}-key-okta-secrets`, {
+      secretName: `${props.config.AppPrefix}-okta-secrets`,
       secretObjectValue: {
         clientId    : cdk.SecretValue.unsafePlainText(""),
         clientSecret: cdk.SecretValue.unsafePlainText(""),
@@ -43,7 +43,7 @@ export class BAWSPrereqStack extends cdk.Stack {
     });
 
     //Create Gitlab Admins Secret
-    new secretsmanager.Secret(this, `${props.config.AppPrefix}-key-gitlab-admin-secrets`, {      secretName: `${props.config.AppPrefix}-admin-gitlab-secret-infor`,
+    new secretsmanager.Secret(this, `${props.config.AppPrefix}-key-gitlab-admin-secrets`, {      secretName: `${props.config.AppPrefix}-admin-gitlab-secrets`,
       secretObjectValue: {
         username: cdk.SecretValue.unsafePlainText("baws-admin"),
         password: cdk.SecretValue.unsafePlainText(""),

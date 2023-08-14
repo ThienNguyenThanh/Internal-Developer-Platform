@@ -1,61 +1,14 @@
 {
-  "availability-zones:account=793443493308:region=us-east-1": [
+  "hosted-zone:account=750801192292:domainName=s3836455assignment2.online:region=us-east-1": {
+    "Id": "/hostedzone/Z06569642FHT6P1XIE9QR",
+    "Name": "s3836455assignment2.online."
+  },
+  "availability-zones:account=750801192292:region=us-east-1": [
     "us-east-1a",
     "us-east-1b",
     "us-east-1c",
     "us-east-1d",
     "us-east-1e",
     "us-east-1f"
-  ],
-  "hosted-zone:account=793443493308:domainName=s3836455assignment2.online:region=us-east-1": {
-    "Id": "/hostedzone/Z0037916XS7Y41TY2SG9",
-    "Name": "s3836455assignment2.online."
-  },
-  "vpc-provider:account=793443493308:filter.tag:Name=Backstage Network:region=us-east-1:returnAsymmetricSubnets=true": {
-    "vpcId": "vpc-0012061fde568ea8c",
-    "vpcCidrBlock": "10.0.0.0/20",
-    "availabilityZones": [],
-    "subnetGroups": [
-      {
-        "name": "Private",
-        "type": "Private",
-        "subnets": [
-          {
-            "subnetId": "subnet-0729632fa0b49b848",
-            "cidr": "10.0.8.0/22",
-            "availabilityZone": "us-east-1a",
-            "routeTableId": "rtb-0cf2196cbdeb544e9"
-          },
-          {
-            "subnetId": "subnet-034c8235e90887082",
-            "cidr": "10.0.12.0/22",
-            "availabilityZone": "us-east-1b",
-            "routeTableId": "rtb-0aef182ffec13b66f"
-          }
-        ]
-      },
-      {
-        "name": "Public",
-        "type": "Public",
-        "subnets": [
-          {
-            "subnetId": "subnet-0f7ed72a3d5999dcf",
-            "cidr": "10.0.0.0/22",
-            "availabilityZone": "us-east-1a",
-            "routeTableId": "rtb-06de95ff89ac57e38"
-          },
-          {
-            "subnetId": "subnet-01099a00482782350",
-            "cidr": "10.0.4.0/22",
-            "availabilityZone": "us-east-1b",
-            "routeTableId": "rtb-0089f58a2be3fe252"
-          }
-        ]
-      }
-    ]
-  },
-  "security-group:account=793443493308:region=us-east-1:securityGroupName=baws-alb-gitlab-runner-sg:vpcId=vpc-0012061fde568ea8c": {
-    "securityGroupId": "sg-0ea7b55ee6f19e187",
-    "allowAllOutbound": false
-  }
+  ]
 }

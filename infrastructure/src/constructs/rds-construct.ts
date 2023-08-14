@@ -40,14 +40,14 @@ export class RdsConstruct extends Construct {
         secretName: `${props.config.AppPrefix}-db-secrets`,
         encryptionKey: props.kmsKey,
         // excludeCharacters:"^ %+~`#$&*()|[]{}:;,-<>?!'/\\\",=",
-        // replicaRegions: [{ region: "eu-west-2" }],
+        replicaRegions: [{ region: "eu-west-2" }],
       }),
       storageEncryptionKey: props.kmsKey,
       storageEncrypted: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       deletionProtection: false,
       instanceProps: {
-        instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.MEDIUM),
+        instanceType: ec2.InstanceType.of(ec2.InstanceClass.R6G, ec2.InstanceSize.XLARGE),
         vpcSubnets: {
           subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
         },

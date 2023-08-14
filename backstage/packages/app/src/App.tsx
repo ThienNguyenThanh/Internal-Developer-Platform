@@ -16,7 +16,7 @@ import { SearchPage } from '@backstage/plugin-search';
 import { TechRadarPage } from '@backstage/plugin-tech-radar';
 import {
   TechDocsIndexPage,
-  techdocsPlugin,
+  // techdocsPlugin,
   TechDocsReaderPage,
 } from '@backstage/plugin-techdocs';
 import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
@@ -36,6 +36,7 @@ import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/
 import { AppCatalogPage } from '@aws/plugin-aws-apps-for-backstage';
 import {SignInPage} from '@backstage/core-components'
 import { microsoftAuthApiRef, oktaAuthApiRef } from '@backstage/core-plugin-api';
+import { SecretManagerPage } from '@internal/plugin-secret-manager';
 
 const app = createApp({
   apis,
@@ -66,7 +67,7 @@ const app = createApp({
   bindRoutes({ bind }) {
     bind(catalogPlugin.externalRoutes, {
       createComponent: scaffolderPlugin.routes.root,
-      viewTechDoc: techdocsPlugin.routes.docRoot,
+      // viewTechDoc: techdocsPlugin.routes.docRoot,
     });
     bind(apiDocsPlugin.externalRoutes, {
       registerApi: catalogImportPlugin.routes.importPage,
@@ -121,6 +122,7 @@ const routes = (
     </Route>
     <Route path="/settings" element={<UserSettingsPage />} />
     <Route path="/catalog-graph" element={<CatalogGraphPage />} />
+    <Route path="/secret-manager" element={<SecretManagerPage />} />
   </FlatRoutes>
 );
 

@@ -74,12 +74,12 @@ export class BAWSStack extends cdk.Stack {
     });
 
     // Create VPC for hosting apps ENV1 - Developers
-    // const appsNetwork1 = new NetworkConstruct(this, "Backstage Apps Dev Network1", {
-    //   config: props.config,
-    //   cidrRange: "192.168.0.0/20",
-    //   isIsolated: false,
-    //   id: "app-dev-network1",
-    // });
+    const appsNetwork1 = new NetworkConstruct(this, "Backstage Apps Dev Network1", {
+      config: props.config,
+      cidrRange: "192.168.0.0/20",
+      isIsolated: false,
+      id: "app-dev-network1",
+    });
 
     // Create VPC for hosting apps ENV1 - Developers - Private
     const appsNetwork2 = new NetworkConstruct(this, "Backstage Apps Dev Network2", {
@@ -167,7 +167,7 @@ export class BAWSStack extends cdk.Stack {
       isFargateCluster: false,
       ec2MinCapacity: 0,
       ec2MaxCapacity: 2,
-      ec2InstanceType: new ec2.InstanceType("t2.micro"),
+      ec2InstanceType: new ec2.InstanceType("t3.large"),
       ec2VpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
       config: props.config,
       encryptionKey: key,
@@ -228,13 +228,13 @@ export class BAWSStack extends cdk.Stack {
 
     const oktaSecret = secretsmanager.Secret.fromSecretNameV2(
       this,
-      `${props.config.AppPrefix}-okta-secret-infor`,
+      `${props.config.AppPrefix}-okta-secrets`,
       props.config.OktaConfigSecret
     );
 
     const gitlabAdminSecret = secretsmanager.Secret.fromSecretNameV2(
       this,
-      `${props.config.AppPrefix}-admin-gitlab-secret-infor`,
+      `${props.config.AppPrefix}-admin-gitlab-secrets`,
       props.config.GitlabSecret
     );
 
@@ -289,7 +289,7 @@ export class BAWSStack extends cdk.Stack {
       KMSkey: key,
       vpcCollection: [
         backstageNetwork.vpc,
-        // appsNetwork1.vpc,
+        appsNetwork1.vpc,
         appsNetwork2.vpc,
         // appsNetwork3.vpc,
         // appsNetwork4.vpc,
@@ -313,8 +313,7 @@ export class BAWSStack extends cdk.Stack {
     const appDevRoleSeedData = this.createAppRole("developers", {
       config: props.config,
       KMSkey: key,
-      vpcCollection: [appsNetwork2.vpc],
-      // vpcCollection: [appsNetwork1.vpc, appsNetwork2.vpc],
+      vpcCollection: [appsNetwork1.vpc, appsNetwork2.vpc],
       isAdmin: false,
       isRoot: false,
       ecsCollection: [ isolatedDevAppCluster.cluster],

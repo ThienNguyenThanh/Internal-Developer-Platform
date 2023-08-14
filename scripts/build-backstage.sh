@@ -1,5 +1,5 @@
 echo "Building the backstage app"
-cd backstage/
+cd backstage-thien/
 yarn tsc
 yarn build:all
 # yarn build-image

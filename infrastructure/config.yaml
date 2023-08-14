@@ -1,10 +1,10 @@
 AppPrefix: "baws"
-Account: "793443493308"
+Account: "750801192292"
 Region: "us-east-1"
 ReplicaRegion: "us-west-2"
-OktaConfigSecret: "baws-okta-secret-infor"
+OktaConfigSecret: "baws-okta-secrets"
 DbConfigSecret: "baws-db-secrets"
-GitlabSecret: "baws-admin-gitlab-secret-infor"
+GitlabSecret: "baws-admin-gitlab-secrets"
 GitlabAmi: "ami-08bd402cb9916c2e3"
 R53HostedZoneName: "s3836455assignment2.online"
 AllowedIPs:
