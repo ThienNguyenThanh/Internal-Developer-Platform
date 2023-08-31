@@ -1,0 +1,29 @@
+.MuiTableCell-head {
+    font-weight: bold !important;
+    color: #000 !important;
+}
+
+.MuiTableCell-root {
+    padding: 5px 10px !important;
+}
+
+.main-section {
+    padding: 10px 20px !important;
+}
+
+#table-filter-bar {
+    padding: 10px 0;
+}
+
+.MuiTextField-root {
+    width: 100%;
+}
+
+.MuiInputBase-input {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+
+#audit-table-container {
+    padding: 0 20px 20px 20px;
+}

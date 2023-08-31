@@ -1248,6 +1248,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@aws-sdk/lib-dynamodb@npm:^3.398.0":
+  version: 3.398.0
+  resolution: "@aws-sdk/lib-dynamodb@npm:3.398.0"
+  dependencies:
+    "@aws-sdk/util-dynamodb": 3.398.0
+    tslib: ^2.5.0
+  peerDependencies:
+    "@aws-sdk/client-dynamodb": ^3.0.0
+  checksum: 64d534e703806b64831cca0292784aee8b9265e3245a8cc232d366ba93868b54ca11f9392b6511b5db22a90474066f2ca5d23e8f9bd5f9ca2ab709cec6db2d61
+  languageName: node
+  linkType: hard
+
 "@aws-sdk/lib-storage@npm:^3.350.0":
   version: 3.388.0
   resolution: "@aws-sdk/lib-storage@npm:3.388.0"
@@ -1875,6 +1887,15 @@ __metadata:
     "@aws-sdk/types": 3.296.0
     tslib: ^2.5.0
   checksum: 0cba68364659c3e28a351a42b9e5c80441388a1963187c4c349b63d4ebefed6bbffb8dfe4cb372f7ec29dd005f6d9f2a05a46b4bfc4e465c26cd0926b06134d2
+  languageName: node
+  linkType: hard
+
+"@aws-sdk/util-dynamodb@npm:3.398.0":
+  version: 3.398.0
+  resolution: "@aws-sdk/util-dynamodb@npm:3.398.0"
+  dependencies:
+    tslib: ^2.5.0
+  checksum: 45038ba6e19e6e6ab1e60dd0bf0c012cb18054da3f3401b99aafe4d4c0bb4f9b6d19ad04880c3b206847c40a9e2934073bed8bbe7354da34eb075b79f89fccb4
   languageName: node
   linkType: hard
 
@@ -12876,6 +12897,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "app@workspace:packages/app"
   dependencies:
+    "@aws-sdk/lib-dynamodb": ^3.398.0
     "@aws/plugin-aws-apps-demo-for-backstage": ^0.1.0
     "@aws/plugin-aws-apps-for-backstage": ^0.1.0
     "@backstage/app-defaults": ^1.4.1
@@ -12915,6 +12937,7 @@ __metadata:
     "@testing-library/user-event": ^14.0.0
     "@types/node": ^16.11.26
     "@types/react-dom": "*"
+    aws-sdk: ^2.1448.0
     cross-env: ^7.0.0
     cypress: ^9.7.0
     eslint-plugin-cypress: ^2.10.3
@@ -13352,6 +13375,24 @@ __metadata:
     uuid: 8.0.0
     xml2js: 0.5.0
   checksum: 3ac5c12629a90a41f45d0bab640860a97a5df2c59ba257e33d20210bd421b1b67d317d4c8ab6e6b49aa6e650f4fe9a4a4ea11ccb374974168f5dde5a92d86be4
+  languageName: node
+  linkType: hard
+
+"aws-sdk@npm:^2.1448.0":
+  version: 2.1448.0
+  resolution: "aws-sdk@npm:2.1448.0"
+  dependencies:
+    buffer: 4.9.2
+    events: 1.1.1
+    ieee754: 1.1.13
+    jmespath: 0.16.0
+    querystring: 0.2.0
+    sax: 1.2.1
+    url: 0.10.3
+    util: ^0.12.4
+    uuid: 8.0.0
+    xml2js: 0.5.0
+  checksum: 2e0a7974fdb9278bf3c0326df9ddc17ed36f5157323339aeb5d5c200d3c05be2a5c3ed123b82894c48c46500a971338610ec6d96f19f76948c584dbc5ecd4ae0
   languageName: node
   linkType: hard
 

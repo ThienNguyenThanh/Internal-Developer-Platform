@@ -38,6 +38,7 @@ import {SignInPage} from '@backstage/core-components'
 import {microsoftAuthApiRef, oktaAuthApiRef,  } from '@backstage/core-plugin-api';
 import { SecretManagerPage } from '@internal/plugin-secret-manager';
 import {azureOIDCAuthApiRef} from './apis'
+import { AuditLogsPage } from './components/audit-logs/AuditLogsPage';
 
 
 const app = createApp({
@@ -133,6 +134,7 @@ const routes = (
     <Route path="/settings" element={<UserSettingsPage />} />
     <Route path="/catalog-graph" element={<CatalogGraphPage />} />
     <Route path="/secret-manager" element={<SecretManagerPage />} />
+    <Route path="/audit-logs" element={<AuditLogsPage />} />
   </FlatRoutes>
 );
 
